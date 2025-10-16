@@ -30,7 +30,8 @@ const AREAS = [
   "Acción Social y Comunitaria",
   "Investigación (Convocatorias)",
   "Seguridad y Supervisión",
-  "Compras"
+  "Compras",
+  "FSA"
 ];
 
 // 3️⃣ Utilidades básicas
@@ -139,3 +140,4 @@ $("#resetDay").addEventListener("click", async ()=>{
 
 // 🔟 Arrancar todo
 ensureInit().then(startLive);
+
