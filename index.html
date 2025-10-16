@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Checklist diaria — Musicala</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>✅ Checklist diaria — Musicala</h1>
+    <div class="bar-right">
+      <span id="today"></span>
+      <select id="who" title="Quién marca">
+        <option value="Alek">Alek</option>
+        <option value="Cata">Cata</option>
+        <option value="Ambos">Ambos</option>
+      </select>
+      <button id="resetDay" class="ghost" title="Pone todo en blanco">Reiniciar día</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="progress">
+      <div class="progress-line">
+        <div id="progFill" class="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-meta">
+        <strong id="progPct">0%</strong>
+        <span id="progDetail">0 de 0</span>
+      </div>
+    </section>
+
+    <div id="list" class="list"></div>
+  </main>
+
+  <template id="itemTmpl">
+    <div class="item">
+      <label class="row">
+        <input type="checkbox" class="chk" />
+        <span class="area"></span>
+      </label>
+      <div class="metaRow">
+        <small class="by">—</small>
+        <small class="time"></small>
+      </div>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

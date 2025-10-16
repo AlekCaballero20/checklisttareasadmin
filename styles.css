@@ -1,0 +1,56 @@
+:root{
+  --azul: #1f3b83;       /* Azul Mozart (aprox) */
+  --violeta: #6b3fa0;    /* Violeta Beethoven */
+  --magenta: #cc2b6f;    /* Magenta Brahms */
+  --bg: #f7f8fc;
+  --card: #ffffff;
+  --ring: #e5e7eb;
+  --text: #111827;
+  --muted:#6b7280;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+}
+
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 16px; color:#fff;
+  background: linear-gradient(90deg, var(--azul), var(--violeta), var(--magenta));
+}
+.topbar h1{ margin:0; font-size:1.05rem; font-weight:800 }
+.bar-right{ display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.topbar select, .topbar button{
+  border:0; border-radius:10px; padding:8px 10px; font-weight:600; cursor:pointer;
+}
+.topbar select{ color:#111; background:#fff; }
+.topbar .ghost{
+  background:transparent; color:#fff; border:1px dashed rgba(255,255,255,.75);
+}
+.topbar .ghost:hover{ border-style:solid }
+
+.container{ max-width:780px; margin:18px auto; padding:0 14px; }
+
+.progress{ background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:12px 14px; margin-bottom:12px }
+.progress-line{
+  width:100%; height:10px; background:#eef1f5; border-radius:999px; overflow:hidden;
+}
+.progress-fill{
+  height:100%; background:linear-gradient(90deg, var(--azul), var(--violeta), var(--magenta));
+  transition: width .25s ease;
+}
+.progress-meta{ margin-top:8px; display:flex; gap:8px; align-items:center; color:var(--muted) }
+.progress-meta strong{ color:var(--text) }
+
+.list{ display:grid; gap:10px; }
+.item{
+  background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:12px 14px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04);
+}
+.row{ display:flex; align-items:center; gap:12px; font-weight:700 }
+.area{ font-size:1rem; }
+.chk{ width:22px; height:22px; accent-color: var(--magenta); }
+
+.metaRow{ margin-top:4px; display:flex; gap:12px; color:var(--muted) }
