@@ -31,7 +31,8 @@ const AREAS = [
   "Investigación (Convocatorias)",
   "Seguridad y Supervisión",
   "Compras",
-  "FSA"
+  "FSA",
+  "Desarrollo de contenido"
 ];
 
 // 3️⃣ Utilidades básicas
@@ -140,4 +141,5 @@ $("#resetDay").addEventListener("click", async ()=>{
 
 // 🔟 Arrancar todo
 ensureInit().then(startLive);
+
 
