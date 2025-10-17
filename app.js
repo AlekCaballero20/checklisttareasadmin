@@ -58,15 +58,15 @@ const CATS = {
     "Programas Online",
     "Seguimiento a docentes y novedades",
   ],
+  "Legal": [
+    "Licencia de Secretaría de Educación",
+    "Verificación de contratos vigentes",
+    "Seguimiento trámites (cámaras/SEC)"
+  ],
   "Dirección": [
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
     "Aprobación de decisiones urgentes"
-  ],
-  "Legal": [
-    "Verificación de contratos vigentes",
-    "Revisión de documentos para firma",
-    "Seguimiento trámites (cámaras/SEC)"
   ],
   "Gerencia y administración": [
     "Agenda y delegación del día",
@@ -374,6 +374,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
