@@ -13,6 +13,25 @@ const db = firebase.database();
 
 // 2) Definición de CATEGORÍAS y SUBTAREAS (ajusta lo que quieras)
 const CATS = {
+  "Alianzas y convenios": [
+    "FSA",
+    "FESICOL",
+    "AMESE",
+    "GoIntegro",
+    "FONEH",
+    "Son Geniales",
+    "Faber Castell",
+    "British Columbia Group",
+    "Addi",
+    "Bold",
+    "Full 80's",
+    "Gestionarte",
+    "chatholamaestro",
+    "Safe Mode",
+    "Controversia",
+    "Bionic",
+    "Buscar nuevas alianzas y convenios"
+  ],
   "Dirección": [
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
@@ -67,11 +86,6 @@ const CATS = {
     "Revisión de bugs reportados",
     "Deploy / cambios urgentes",
     "Backups / chequeos básicos"
-  ],
-  "Alianzas y convenios": [
-    "Mensajes pendientes a aliados",
-    "Propuesta en curso actualizada",
-    "Agendar o confirmar reunión"
   ],
   "Acción Social y Comunitaria": [
     "Contacto con comunidad/centros",
@@ -355,3 +369,4 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
