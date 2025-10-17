@@ -68,7 +68,8 @@ const CATS = {
   "Dirección": [
     "Revisión del Calendario Anual",
     "Revisión de prioridades del día",
-    "Seguimiento a indicadores clave",
+    "Seguimiento a indicadores clave (KPI's)",
+    "Seguimiento de PQRS",
     "Aprobación de decisiones urgentes"
   ],
   "Gerencia y administración": [
@@ -377,6 +378,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
