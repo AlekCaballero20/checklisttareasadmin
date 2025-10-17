@@ -76,7 +76,7 @@ const CATS = {
     "Compra menor / gestiones administrativas"
   ],
   "Seguridad y Salud en el Trabajo": [
-    "Chequeo programaciones Safe Mode",
+    "Comité de Convivencia Laboral (CCL)",
     "Verificación de incidentes / novedades",
     "Tareas SG-SST programadas hoy"
   ],
@@ -376,5 +376,6 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
