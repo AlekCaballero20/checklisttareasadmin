@@ -71,3 +71,7 @@ body{
 .chk{ width:20px; height:20px; accent-color: var(--magenta); }
 
 .metaRow{ margin-top:4px; display:flex; gap:12px; color:var(--muted) }
+
+/* Colapsar categorías de forma confiable */
+.cat.collapsed .tasks { display: none; }
+.catHead .toggleBtn { width: 28px; }
