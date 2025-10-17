@@ -31,7 +31,7 @@ body{
 }
 .topbar .ghost:hover{ border-style:solid }
 
-.container{ max-width:780px; margin:18px auto; padding:0 14px; }
+.container{ max-width:900px; margin:18px auto; padding:0 14px; }
 
 .progress{ background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:12px 14px; margin-bottom:12px }
 .progress-line{
@@ -44,13 +44,30 @@ body{
 .progress-meta{ margin-top:8px; display:flex; gap:8px; align-items:center; color:var(--muted) }
 .progress-meta strong{ color:var(--text) }
 
-.list{ display:grid; gap:10px; }
-.item{
-  background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:12px 14px;
+.cats{ display:grid; gap:12px; }
+
+.cat{
+  background:var(--card); border:1px solid var(--ring); border-radius:14px; padding:10px 12px;
   box-shadow:0 1px 2px rgba(16,24,40,.04);
 }
-.row{ display:flex; align-items:center; gap:12px; font-weight:700 }
-.area{ font-size:1rem; }
-.chk{ width:22px; height:22px; accent-color: var(--magenta); }
+.catHead{
+  display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
+}
+.toggleBtn{
+  border:0; background:#eef1f5; border-radius:8px; width:30px; height:30px; cursor:pointer; font-weight:700;
+}
+.catTitle{ margin:0; font-size:1rem }
+.catProgressWrap{ display:flex; align-items:center; gap:10px; }
+.catProgressLine{ width:140px; height:8px; background:#eef1f5; border-radius:999px; overflow:hidden; }
+.catProgressFill{ height:100%; width:0%; background:linear-gradient(90deg, var(--azul), var(--violeta), var(--magenta)); transition:width .25s }
+.catMeta{ color:var(--muted) }
+
+.tasks{ margin-top:10px; display:grid; gap:8px; }
+.task{
+  background:#fff; border:1px solid var(--ring); border-radius:12px; padding:10px 12px;
+}
+.row{ display:flex; align-items:center; gap:10px; font-weight:600 }
+.taskName{ font-size:.98rem; }
+.chk{ width:20px; height:20px; accent-color: var(--magenta); }
 
 .metaRow{ margin-top:4px; display:flex; gap:12px; color:var(--muted) }
