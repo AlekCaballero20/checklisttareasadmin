@@ -53,6 +53,7 @@ const CATS = {
     "Compra menor / gestiones administrativas"
   ],
   "Recursos Humanos": [
+    "Contratación",
     "Novedades de nómina",
     "Contratación / afiliaciones pendientes",
     "Comunicación con equipo (avisos)"
@@ -373,3 +374,4 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
