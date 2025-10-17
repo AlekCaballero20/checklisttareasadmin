@@ -54,6 +54,10 @@ const CATS = {
     "Novedades de nómina",
     "Comunicación con equipo (avisos)"
   ],
+  "Académico": [
+    "Programas Online",
+    "Seguimiento a docentes y novedades",
+  ],
   "Dirección": [
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
@@ -78,11 +82,6 @@ const CATS = {
     "Aseo y orden de espacios",
     "Inventario básico (papelería / limpieza)",
     "Solicitudes de mantenimiento"
-  ],
-  "Académico": [
-    "Programación de clases / ajustes",
-    "Seguimiento a docentes y novedades",
-    "Materiales / recursos para la jornada"
   ],
   "Programación (sistemas)": [
     "Revisión de bugs reportados",
@@ -375,6 +374,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
