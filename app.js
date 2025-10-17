@@ -55,7 +55,6 @@ const CATS = {
   "Recursos Humanos": [
     "Contratación",
     "Novedades de nómina",
-    "Contratación / afiliaciones pendientes",
     "Comunicación con equipo (avisos)"
   ],
   "Seguridad y Salud en el Trabajo": [
@@ -374,4 +373,5 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
