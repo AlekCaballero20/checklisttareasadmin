@@ -52,6 +52,7 @@ const CATS = {
     "Contratación",
     "Jornadas de trabajo",
     "Novedades de nómina",
+    "Radicación de Incapacidades",
     "Comunicación con equipo (avisos)"
   ],
   "Académico": [
@@ -374,3 +375,4 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
