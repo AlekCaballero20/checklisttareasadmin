@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Checklist diaria — Musicala</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Firebase SDK (compat) -->
+  <!-- SDKs de Firebase (compatibles con app.js) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
 </head>
@@ -19,7 +19,9 @@
         <option value="Cata">Cata</option>
         <option value="Ambos">Ambos</option>
       </select>
-      <button id="resetDay" class="ghost" title="Pone todo en blanco">Reiniciar día</button>
+      <button id="expandAll" class="ghost">Expandir todo</button>
+      <button id="collapseAll" class="ghost">Contraer todo</button>
+      <button id="resetDay" class="ghost">Reiniciar día</button>
     </div>
   </header>
 
@@ -30,18 +32,34 @@
       </div>
       <div class="progress-meta">
         <strong id="progPct">0%</strong>
-        <span id="progDetail">0 de 0</span>
+        <span id="progDetail">0 de 0 tareas</span>
       </div>
     </section>
 
-    <div id="list" class="list"></div>
+    <div id="cats" class="cats"></div>
   </main>
 
-  <template id="itemTmpl">
-    <div class="item">
+  <!-- Template de categoría -->
+  <template id="catTmpl">
+    <section class="cat">
+      <header class="catHead">
+        <button class="toggleBtn" aria-label="expandir/contraer">▸</button>
+        <h2 class="catTitle"></h2>
+        <div class="catProgressWrap">
+          <div class="catProgressLine"><div class="catProgressFill"></div></div>
+          <small class="catMeta"></small>
+        </div>
+      </header>
+      <div class="tasks" hidden></div>
+    </section>
+  </template>
+
+  <!-- Template de tarea -->
+  <template id="taskTmpl">
+    <div class="task">
       <label class="row">
         <input type="checkbox" class="chk" />
-        <span class="area"></span>
+        <span class="taskName"></span>
       </label>
       <div class="metaRow">
         <small class="by">—</small>
@@ -50,6 +68,7 @@
     </div>
   </template>
 
+  <!-- Tu script principal -->
   <script src="app.js"></script>
 </body>
 </html>
