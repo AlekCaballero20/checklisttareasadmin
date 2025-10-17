@@ -374,15 +374,3 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
-
-
-
-
-
-
-
-
-
-
-
-
