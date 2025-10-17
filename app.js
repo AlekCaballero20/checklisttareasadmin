@@ -48,6 +48,12 @@ const CATS = {
     "Flujo de caja del día",
     "Pagos o ingresos registrados",
   ],
+  "Recursos Humanos": [
+    "Contratación",
+    "Jornadas de trabajo",
+    "Novedades de nómina",
+    "Comunicación con equipo (avisos)"
+  ],
   "Dirección": [
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
@@ -62,12 +68,6 @@ const CATS = {
     "Agenda y delegación del día",
     "Revisión de bandeja (pendientes críticos)",
     "Compra menor / gestiones administrativas"
-  ],
-  "Recursos Humanos": [
-    "Contratación",
-    "Jornadas de trabajo",
-    "Novedades de nómina",
-    "Comunicación con equipo (avisos)"
   ],
   "Seguridad y Salud en el Trabajo": [
     "Chequeo programaciones Safe Mode",
@@ -375,6 +375,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
