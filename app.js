@@ -65,6 +65,7 @@ const CATS = {
   ],
   "Recursos Humanos": [
     "Contratación",
+    "Jornadas de trabajo",
     "Novedades de nómina",
     "Comunicación con equipo (avisos)"
   ],
@@ -374,6 +375,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
