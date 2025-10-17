@@ -39,6 +39,10 @@ const CATS = {
     "Mejora del Flujo de Comunicación de Keybe",
     "Mejora de los programas de Atención al Cliente y Ventas"
   ],
+  "Diseño y Marketing": [
+    "Revisión de campañas activas",
+    "Actualizar contenido para Marketing",
+  ],
   "Dirección": [
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
@@ -78,11 +82,6 @@ const CATS = {
     "Programación de clases / ajustes",
     "Seguimiento a docentes y novedades",
     "Materiales / recursos para la jornada"
-  ],
-  "Diseño y Marketing": [
-    "Publicación / Historia del día",
-    "Pieza o copy prioritario listo",
-    "Revisión de campañas activas"
   ],
   "Programación (sistemas)": [
     "Revisión de bugs reportados",
@@ -375,6 +374,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
