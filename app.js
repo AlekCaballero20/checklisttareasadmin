@@ -32,6 +32,11 @@ const CATS = {
     "Bionic",
     "Buscar nuevas alianzas y convenios"
   ],
+  "Atención al Cliente y Ventas": [
+    "Mensajes/WhatsApp y correos respondidos",
+    "Seguimiento a leads calientes",
+    "Agendamiento / confirmación de citas"
+  ],
   "Dirección": [
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
@@ -71,11 +76,6 @@ const CATS = {
     "Programación de clases / ajustes",
     "Seguimiento a docentes y novedades",
     "Materiales / recursos para la jornada"
-  ],
-  "Atención al Cliente y Ventas": [
-    "Mensajes/WhatsApp y correos respondidos",
-    "Seguimiento a leads calientes",
-    "Agendamiento / confirmación de citas"
   ],
   "Diseño y Marketing": [
     "Publicación / Historia del día",
@@ -373,5 +373,6 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
