@@ -43,6 +43,11 @@ const CATS = {
     "Revisión de campañas activas",
     "Actualizar contenido para Marketing",
   ],
+  "Contabilidad y Finanzas": [
+    "Plan Financiero",
+    "Flujo de caja del día",
+    "Pagos o ingresos registrados",
+  ],
   "Dirección": [
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
@@ -52,11 +57,6 @@ const CATS = {
     "Verificación de contratos vigentes",
     "Revisión de documentos para firma",
     "Seguimiento trámites (cámaras/SEC)"
-  ],
-  "Contabilidad y Finanzas": [
-    "Flujo de caja del día",
-    "Pagos o ingresos registrados",
-    "Conciliación rápida (bancos y ventas)"
   ],
   "Gerencia y administración": [
     "Agenda y delegación del día",
@@ -374,6 +374,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
