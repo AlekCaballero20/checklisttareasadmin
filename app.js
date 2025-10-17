@@ -41,12 +41,13 @@ const CATS = {
   ],
   "Diseño y Marketing": [
     "Revisión de campañas activas",
-    "Actualizar contenido para Marketing",
+    "Actualizar contenido para Marketing"
   ],
   "Contabilidad y Finanzas": [
     "Plan Financiero",
     "Flujo de caja del día",
     "Pagos o ingresos registrados",
+    "Solicitud de créditos y prétamos"
   ],
   "Recursos Humanos": [
     "Contratación",
@@ -57,7 +58,7 @@ const CATS = {
   ],
   "Académico": [
     "Programas Online",
-    "Seguimiento a docentes y novedades",
+    "Seguimiento a docentes y novedades"
   ],
   "Legal": [
     "Licencia de Secretaría de Educación",
@@ -375,4 +376,5 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
