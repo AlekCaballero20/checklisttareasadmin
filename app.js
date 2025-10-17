@@ -11,7 +11,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// 2) Definición de CATEGORÍAS y SUBTAREAS (ajusta lo que quieras)
+// 2) Definición de CATEGORÍAS y SUBTAREAS (tu versión)
 const CATS = {
   "Alianzas y convenios": [
     "FSA",
@@ -114,7 +114,7 @@ const $ = (q) => document.querySelector(q);
 const todayStr = new Date().toISOString().slice(0,10);
 $("#today").textContent = todayStr;
 
-// RTDB no permite . # $ / [ ]
+// RTDB no permite . # $ / [ ] — sanitizamos claves
 const keyize = (s) => s
   .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
   .replace(/[.#$/\[\]]/g, "_")
@@ -123,10 +123,10 @@ const keyize = (s) => s
 
 const ROOT_PATH = "checklistCurrentV2";
 
-// Estado de UI: qué categorías están abiertas
+// Estado UI: categorías abiertas/cerradas (no se guarda en DB)
 const OPEN = {}; // { [catKey]: true | false }
 
-// Para no duplicar el aviso de “todas cubiertas”
+// Para no duplicar el aviso de “todas cubiertas” por cliente
 let localNotifiedAllCovered = false;
 
 // 4) Inicialización con claves seguras
@@ -148,10 +148,10 @@ async function ensureInit(){
       dateLabel: todayStr,
       categories,
       updatedAt: Date.now(),
-      allCoveredAt: null // timestamp cuando todas las categorías tengan al menos 1 tarea
+      allCoveredAt: null
     });
   } else {
-    // Patch por si agregaste/renombraste tareas o categorías en CATS
+    // Patch por si agregaste/renombraste en CATS
     const val = snap.val();
     const categories = val.categories || {};
     let changed = false;
@@ -192,11 +192,11 @@ function startLive(){
     const data = snap.val(); if(!data) return;
     renderAll(data.categories || {});
     updateGlobalProgress(data.categories || {});
-    maybeNotifyAllCovered(data); // <-- chequea si ya cubrieron todas las categorías
+    maybeNotifyAllCovered(data);
   });
 }
 
-// 6) Render de categorías y tareas (respeta estado OPEN)
+// 6) Render (con clase .collapsed y delegación)
 function renderAll(categories){
   const wrap = $("#cats");
   wrap.innerHTML = "";
@@ -214,6 +214,9 @@ function renderAll(categories){
     const tasksEl  = catNode.querySelector(".tasks");
     const catFill  = catNode.querySelector(".catProgressFill");
     const catMeta  = catNode.querySelector(".catMeta");
+
+    // Para el toggle por delegación
+    section.dataset.catKey = catKey;
 
     titleEl.textContent = catInfo.title || catLabel;
 
@@ -250,31 +253,28 @@ function renderAll(categories){
     catFill.style.width = pct + "%";
     catMeta.textContent = `${done} / ${total}`;
 
-    // Estado de apertura
+    // Estado de apertura (clase .collapsed)
     const isOpen = OPEN[catKey] ?? false;
-    if (isOpen) {
-      tasksEl.removeAttribute("hidden");
-      toggle.textContent = "▾";
-    } else {
-      tasksEl.setAttribute("hidden", "");
-      toggle.textContent = "▸";
-    }
-
-    toggle.addEventListener("click", ()=>{
-      const nowOpen = !(OPEN[catKey] ?? false);
-      OPEN[catKey] = nowOpen;
-      if (nowOpen) {
-        tasksEl.removeAttribute("hidden");
-        toggle.textContent = "▾";
-      } else {
-        tasksEl.setAttribute("hidden", "");
-        toggle.textContent = "▸";
-      }
-    });
+    section.classList.toggle("collapsed", !isOpen);
+    toggle.textContent = isOpen ? "▾" : "▸";
 
     wrap.appendChild(catNode);
   });
 }
+
+// Delegación para toggles (no se rompe con re-render)
+document.getElementById("cats").addEventListener("click", (e)=>{
+  const btn = e.target.closest(".toggleBtn");
+  if (!btn) return;
+  const section = btn.closest(".cat");
+  const catKey = section?.dataset?.catKey;
+  if (!catKey) return;
+
+  const nowOpen = !(OPEN[catKey] ?? false);
+  OPEN[catKey] = nowOpen;
+  section.classList.toggle("collapsed", !nowOpen);
+  btn.textContent = nowOpen ? "▾" : "▸";
+});
 
 // 7) Progreso global (por tareas)
 function updateGlobalProgress(categories){
@@ -304,20 +304,27 @@ async function updateTask(catKey, taskKey, whoOrNull){
   await db.ref(`${ROOT_PATH}/updatedAt`).set(Date.now());
 }
 
-// 9) Expandir/Contraer todo (manteniendo estado)
+// 9) Expandir/Contraer todo (manteniendo estado + clase)
 $("#expandAll").addEventListener("click", ()=>{
   Object.keys(CATS).forEach(catLabel=>{
     OPEN[keyize(catLabel)] = true;
   });
-  document.querySelectorAll(".tasks").forEach(el=> el.removeAttribute("hidden"));
-  document.querySelectorAll(".toggleBtn").forEach(btn=> btn.textContent = "▾");
+  document.querySelectorAll(".cat").forEach(sec=>{
+    sec.classList.remove("collapsed");
+    const btn = sec.querySelector(".toggleBtn");
+    if (btn) btn.textContent = "▾";
+  });
 });
+
 $("#collapseAll").addEventListener("click", ()=>{
   Object.keys(CATS).forEach(catLabel=>{
     OPEN[keyize(catLabel)] = false;
   });
-  document.querySelectorAll(".tasks").forEach(el=> el.setAttribute("hidden",""));
-  document.querySelectorAll(".toggleBtn").forEach(btn=> btn.textContent = "▸");
+  document.querySelectorAll(".cat").forEach(sec=>{
+    sec.classList.add("collapsed");
+    const btn = sec.querySelector(".toggleBtn");
+    if (btn) btn.textContent = "▸";
+  });
 });
 
 // 10) Reiniciar día
@@ -332,7 +339,7 @@ $("#resetDay").addEventListener("click", async ()=>{
       categories[catKey].tasks[taskKey] = { label: taskLabel, done:false, by:null, time:null };
     });
   });
-  localNotifiedAllCovered = false; // resetea aviso local
+  localNotifiedAllCovered = false;
   await db.ref(ROOT_PATH).update({
     categories,
     dateLabel: todayStr,
@@ -354,19 +361,15 @@ function maybeNotifyAllCovered(data){
     if (hasOne) covered++;
   });
 
-  // Si todas las categorías están cubiertas y aún no notificamos hoy, avisamos.
   const allCovered = covered === totalCats;
   const alreadyStamped = !!data.allCoveredAt;
 
   if (allCovered && !alreadyStamped && !localNotifiedAllCovered){
-    localNotifiedAllCovered = true; // evita dobles alerts en este cliente
-    // Guarda una marca para que en otros clientes no se duplique el aviso
+    localNotifiedAllCovered = true;
     db.ref(`${ROOT_PATH}/allCoveredAt`).set(Date.now());
-    // Mensaje (simple). Puedes cambiar por un banner si quieres.
-    alert("🎉 ¡Día cubierto! Cada categoría tiene al menos una tarea realizada. Buenísimo, equipo Musicala.");
+    alert("🎉 ¡Día cubierto! Cada categoría tiene al menos una tarea realizada. ¡Brutales!");
   }
 }
 
 // 12) Arranque
 ensureInit().then(startLive);
-
