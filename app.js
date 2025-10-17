@@ -66,6 +66,7 @@ const CATS = {
     "Seguimiento trámites (cámaras/SEC)"
   ],
   "Dirección": [
+    "Revisión del Calendario Anual",
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave",
     "Aprobación de decisiones urgentes"
@@ -376,6 +377,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
