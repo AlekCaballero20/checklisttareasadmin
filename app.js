@@ -34,8 +34,9 @@ const CATS = {
   ],
   "Atención al Cliente y Ventas": [
     "Mensajes/WhatsApp y correos respondidos",
-    "Seguimiento a leads calientes",
-    "Agendamiento / confirmación de citas"
+    "Seguimiento a clientes potenciales",
+    "Agendamiento / confirmación de clases"
+    "Mejora del Flujo de Comunicación de Keybe"
   ],
   "Dirección": [
     "Revisión de prioridades del día",
@@ -373,6 +374,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
