@@ -96,16 +96,15 @@ const CATS = {
     "Búsqueda de nuevas convocatorias",
     "Seguimiento de postulaciones"
   ],
-  "Seguridad y Supervisión": [
-    "Revisión de accesos / llaves",
-    "Checklist de equipos (mínimo)",
-    "Observaciones de seguridad anotadas"
-  ],
   "Compras": [
     "Revisión de necesidades urgentes",
     "Cotización / compra menor",
     "Registro de factura / soporte"
   ]
+  "Seguridad y Supervisión": [
+    "Supervisión general de seguridad",
+    "Seguimiento y prevención de situaciones de inseguridad"
+  ],
 };
 
 // 3) Utils generales
@@ -372,6 +371,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
