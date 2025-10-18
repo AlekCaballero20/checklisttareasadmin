@@ -93,9 +93,8 @@ const CATS = {
     "Registro de acciones del día"
   ],
   "Investigación (Convocatorias)": [
-    "Búsqueda o lectura (15 min)",
-    "Actualizar requisitos / documentos",
-    "Cronograma / fechas al día"
+    "Búsqueda de nuevas convocatorias",
+    "Seguimiento de postulaciones"
   ],
   "Seguridad y Supervisión": [
     "Revisión de accesos / llaves",
@@ -373,6 +372,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
