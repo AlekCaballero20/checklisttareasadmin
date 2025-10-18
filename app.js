@@ -87,11 +87,6 @@ const CATS = {
     "Inventario básico (papelería / limpieza)",
     "Solicitudes de mantenimiento"
   ],
-  "Programación (sistemas)": [
-    "Revisión de bugs reportados",
-    "Deploy / cambios urgentes",
-    "Backups / chequeos básicos"
-  ],
   "Acción Social y Comunitaria": [
     "Contacto con comunidad/centros",
     "Seguimiento a casos especiales",
@@ -378,6 +373,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
