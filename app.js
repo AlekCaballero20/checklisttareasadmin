@@ -73,7 +73,7 @@ const CATS = {
     "Aprobación de decisiones urgentes"
   ],
   "Gerencia y administración": [
-    "Agenda y delegación del día",
+    "Agenda y Tareas de equipo",
     "Revisión de bandeja (pendientes críticos)",
     "Compra menor / gestiones administrativas"
   ],
@@ -378,6 +378,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
