@@ -60,6 +60,10 @@ const CATS = {
     "Programas Online",
     "Seguimiento a docentes y novedades"
   ],
+  "Eventos y Actividades": [
+    "Musicala Fest",
+    "Muestras de Proceso"
+  ],
   "Legal": [
     "Licencia de Secretaría de Educación",
     "Verificación de contratos vigentes",
@@ -372,6 +376,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
