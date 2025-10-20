@@ -35,9 +35,8 @@ const CATS = {
   "Atención al Cliente y Ventas": [
     "Mensajes/WhatsApp y correos respondidos",
     "Seguimiento a clientes potenciales",
-    "Agendamiento / confirmación de clases",
     "Mejora del Flujo de Comunicación de Keybe",
-    "Mejora de los programas de Atención al Cliente y Ventas"
+    "Mejora de los aplicativos web de Atención al Cliente y Ventas"
   ],
   "Diseño y Marketing": [
     "Revisión de campañas activas",
@@ -376,6 +375,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
