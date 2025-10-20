@@ -61,6 +61,7 @@ const CATS = {
     "Seguimiento a docentes y novedades"
   ],
   "Eventos y Actividades": [
+    "AlegreMente",
     "Musicala Fest",
     "Muestras de Proceso"
   ],
@@ -376,6 +377,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
