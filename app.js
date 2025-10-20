@@ -240,7 +240,21 @@ function renderAll(categories){
       name.textContent = info.label || taskLabel;
       chk.checked = !!info.done;
       byEl.textContent = info.by ? `Hecho por: ${info.by}` : "—";
-      timeEl.textContent = info.time ? new Date(info.time).toLocaleTimeString() : "";
+
+      // ⬇️ ÚNICO CAMBIO: mostrar fecha + hora (12h) cuando existe `time`
+      if (info.time) {
+        const d = new Date(info.time);
+        const fecha = d.toLocaleDateString("es-CO"); // p.ej. 20/10/2025
+        const hora  = d.toLocaleTimeString("es-CO", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true
+        }); // p.ej. 11:32 a. m.
+        timeEl.textContent = `${fecha} ${hora}`;
+      } else {
+        timeEl.textContent = "";
+      }
+      // ⬆️ Fin del cambio
 
       chk.dataset.catKey = catKey;
       chk.dataset.taskKey = taskKey;
@@ -377,18 +391,3 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
