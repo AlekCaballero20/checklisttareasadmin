@@ -33,7 +33,8 @@ const CATS = {
     "Buscar nuevas alianzas y convenios"
   ],
   "Atención al Cliente y Ventas": [
-    "Mensajes/WhatsApp y correos respondidos",
+    "Seguimiento a Mensajes de WhatsApp y Keybe",
+    "Seguimiento a Correos electrónicos",
     "Seguimiento a clientes potenciales",
     "Mejora del Flujo de Comunicación de Keybe",
     "Mejora de los aplicativos web de Atención al Cliente y Ventas"
@@ -375,6 +376,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
