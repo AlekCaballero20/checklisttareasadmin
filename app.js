@@ -44,9 +44,9 @@ const CATS = {
     "Actualizar contenido para Marketing"
   ],
   "Contabilidad y Finanzas": [
+    "Seguimiento de tareas pendientes",
     "Plan Financiero",
-    "Flujo de caja del día",
-    "Pagos o ingresos registrados",
+    "Pagos pendientes",
     "Solicitud de créditos y prétamos"
   ],
   "Recursos Humanos": [
@@ -391,3 +391,4 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
