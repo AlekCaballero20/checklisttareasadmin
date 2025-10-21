@@ -45,6 +45,7 @@ const CATS = {
   ],
   "Contabilidad y Finanzas": [
     "Seguimiento de tareas pendientes",
+    "Seguimiento de Egresos",
     "Plan Financiero",
     "Pagos pendientes",
     "Solicitud de créditos y prétamos"
@@ -391,4 +392,5 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
