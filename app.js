@@ -59,6 +59,7 @@ const CATS = {
   ],
   "Académico": [
     "Programas Online",
+    "Creación de contenido",
     "Seguimiento a docentes y novedades"
   ],
   "Eventos y Actividades": [
@@ -392,5 +393,6 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
