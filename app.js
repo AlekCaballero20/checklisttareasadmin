@@ -81,8 +81,7 @@ const CATS = {
   ],
   "Gerencia y administración": [
     "Agenda y Tareas de equipo",
-    "Revisión de bandeja (pendientes críticos)",
-    "Compra menor / gestiones administrativas"
+    "Revisión de mensajes y correos (pendientes críticos)"
   ],
   "Seguridad y Salud en el Trabajo": [
     "Comité de Convivencia Laboral (CCL)",
@@ -393,6 +392,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
