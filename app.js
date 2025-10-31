@@ -86,7 +86,7 @@ const CATS = {
   "Seguridad y Salud en el Trabajo": [
     "Comité de Convivencia Laboral (CCL)",
     "Verificación de incidentes / novedades",
-    "Tareas SG-SST programadas hoy"
+    "Tareas SG-SST programadas"
   ],
   "Organización y Servicios Generales": [
     "Aseo y orden de espacios",
@@ -392,6 +392,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
