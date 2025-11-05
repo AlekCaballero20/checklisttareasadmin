@@ -40,7 +40,8 @@ const CATS = {
     "Mejora de los aplicativos web de Atención al Cliente y Ventas"
   ],
   "Diseño y Marketing": [
-    "Revisión de campañas activas",
+    "Revisión y mejora de campañas activas",
+    "Revisión y mejora de la Página Web",
     "Actualizar contenido para Marketing"
   ],
   "Contabilidad y Finanzas": [
@@ -392,6 +393,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
