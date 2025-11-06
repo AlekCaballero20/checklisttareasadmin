@@ -52,8 +52,8 @@ const CATS = {
     "Solicitud de créditos y prétamos"
   ],
   "Recursos Humanos": [
-    "Contratación",
     "Jornadas de trabajo",
+    "Contratación",
     "Novedades de nómina",
     "Radicación de Incapacidades"
   ],
@@ -392,6 +392,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
