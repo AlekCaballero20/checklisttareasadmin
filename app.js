@@ -69,8 +69,9 @@ const CATS = {
   ],
   "Legal": [
     "Licencia de Secretaría de Educación",
-    "Verificación de contratos vigentes",
-    "Seguimiento trámites (cámaras/SEC)"
+    "Actualización y mejora de contratos vigentes",
+    "Actualización y mejora del reglamento interno de trabajo",
+    "Seguimiento trámites legales (cámaras/SEC)"
   ],
   "Dirección": [
     "Revisión del Calendario Anual",
@@ -392,6 +393,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
