@@ -95,9 +95,7 @@ const CATS = {
     "Solicitudes de mantenimiento"
   ],
   "Acción Social y Comunitaria": [
-    "Contacto con comunidad/centros",
-    "Seguimiento a casos especiales",
-    "Registro de acciones del día"
+    "Contactos y alianzas"
   ],
   "Investigación (Convocatorias)": [
     "Búsqueda de nuevas convocatorias",
@@ -393,6 +391,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
