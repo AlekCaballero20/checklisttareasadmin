@@ -102,8 +102,7 @@ const CATS = {
     "Seguimiento de postulaciones"
   ],
   "Compras": [
-    "Revisión de necesidades urgentes",
-    "Cotización / compra menor",
+    "Revisión de compras pendientes",
     "Registro de factura / soporte"
   ],
   "Seguridad y Supervisión": [
@@ -391,6 +390,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
