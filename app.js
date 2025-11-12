@@ -42,7 +42,7 @@ const CATS = {
   "Diseño y Marketing": [
     "Revisión y mejora de campañas activas",
     "Revisión y mejora de la Página Web",
-    "Actualizar contenido para Marketing"
+    "Seguimiento contenido para Redes Sociales"
   ],
   "Contabilidad y Finanzas": [
     "Seguimiento de tareas pendientes",
@@ -390,6 +390,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
