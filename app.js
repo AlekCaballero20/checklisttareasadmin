@@ -53,7 +53,7 @@ const CATS = {
   ],
   "Recursos Humanos": [
     "Jornadas de trabajo",
-    "Contratación",
+    "Contratación (vacantes)",
     "Novedades de nómina",
     "Radicación de Incapacidades"
   ],
