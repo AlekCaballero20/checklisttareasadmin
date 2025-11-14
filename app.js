@@ -18,6 +18,8 @@ const CATS = {
     "FESICOL",
     "AMESE",
     "GoIntegro",
+    "Fundación Corazón Peludito",
+    "Fundación Gatitus",
     "FONEH",
     "Son Geniales",
     "Faber Castell",
@@ -390,6 +392,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
