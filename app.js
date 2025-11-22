@@ -15,6 +15,7 @@ const db = firebase.database();
 const CATS = {
   "Alianzas y convenios": [
     "FSA",
+    "UNAD - LEA",
     "FESICOL",
     "AMESE",
     "GoIntegro",
@@ -393,6 +394,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
