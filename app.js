@@ -63,7 +63,8 @@ const CATS = {
   "Académico": [
     "Programas Online",
     "Creación de contenido",
-    "Seguimiento a docentes y novedades"
+    "Seguimiento a docentes y novedades",
+    "Vacaciones artísticas"
   ],
   "Eventos y Actividades": [
     "Musicala Fest",
@@ -394,6 +395,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
