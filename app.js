@@ -40,7 +40,8 @@ const CATS = {
     "Seguimiento a Correos electrónicos",
     "Seguimiento a clientes potenciales",
     "Mejora del Flujo de Comunicación de Keybe",
-    "Mejora de los aplicativos web de Atención al Cliente y Ventas"
+    "Mejora de los aplicativos web de Atención al Cliente y Ventas",
+    "Seguimiento de pendientes en el Calendario"
   ],
   "Diseño y Marketing": [
     "Revisión y mejora de campañas activas",
@@ -395,6 +396,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
