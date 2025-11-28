@@ -13,6 +13,12 @@ const db = firebase.database();
 
 // 2) Definición de CATEGORÍAS y SUBTAREAS (tu versión)
 const CATS = {
+  "Recursos Humanos": [
+    "Jornadas de trabajo",
+    "Contratación (vacantes)",
+    "Novedades de nómina",
+    "Radicación de Incapacidades"
+  ],
   "Alianzas y convenios": [
     "FSA",
     "UNAD - LEA",
@@ -54,12 +60,6 @@ const CATS = {
     "Plan Financiero",
     "Pagos pendientes",
     "Solicitud de créditos y prétamos"
-  ],
-  "Recursos Humanos": [
-    "Jornadas de trabajo",
-    "Contratación (vacantes)",
-    "Novedades de nómina",
-    "Radicación de Incapacidades"
   ],
   "Académico": [
     "Programas Online",
@@ -396,6 +396,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
