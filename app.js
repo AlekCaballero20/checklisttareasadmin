@@ -19,6 +19,10 @@ const CATS = {
     "Novedades de nómina",
     "Radicación de Incapacidades"
   ],
+  "Investigación (Convocatorias)": [
+    "Búsqueda de nuevas convocatorias",
+    "Seguimiento de postulaciones"
+  ],
   "Alianzas y convenios": [
     "FSA",
     "UNAD - LEA",
@@ -102,10 +106,6 @@ const CATS = {
   ],
   "Acción Social y Comunitaria": [
     "Contactos y alianzas"
-  ],
-  "Investigación (Convocatorias)": [
-    "Búsqueda de nuevas convocatorias",
-    "Seguimiento de postulaciones"
   ],
   "Compras": [
     "Revisión de compras pendientes",
@@ -396,6 +396,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
