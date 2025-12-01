@@ -20,8 +20,8 @@ const CATS = {
     "Radicación de Incapacidades"
   ],
   "Investigación (Convocatorias)": [
-    "Búsqueda de nuevas convocatorias",
-    "Seguimiento de postulaciones"
+    "Seguimiento de postulaciones",
+    "Búsqueda de nuevas convocatorias"
   ],
   "Alianzas y convenios": [
     "FSA",
@@ -396,6 +396,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
