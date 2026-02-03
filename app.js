@@ -28,6 +28,7 @@ const CATS = {
     "UNAD - LEA",
     "FESICOL",
     "AMESE",
+    "Catálogo CCB - El Tiempo",
     "GoIntegro",
     "Fundación Corazón Peludito",
     "Fundación Gatitus",
@@ -397,6 +398,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
