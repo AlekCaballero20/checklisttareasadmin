@@ -25,7 +25,7 @@ const CATS = {
   ],
   "Alianzas y convenios": [
     "FSA",
-    "UNAD - LEA",
+    "UD - LEA",
     "FESICOL",
     "AMESE",
     "Catálogo CCB - El Tiempo",
@@ -398,6 +398,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
