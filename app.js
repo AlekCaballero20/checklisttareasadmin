@@ -71,6 +71,7 @@ const CATS = {
     "Programas Online",
     "Creación de contenido",
     "Seguimiento a docentes y novedades",
+    "Talleres esporádicos",
     "Vacaciones artísticas"
   ],
   "Eventos y Actividades": [
@@ -398,6 +399,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
