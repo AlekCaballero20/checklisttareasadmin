@@ -77,6 +77,7 @@ const CATS = {
   "Eventos y Actividades": [
     "Musicala Fest",
     "Muestras de Proceso - Musicala",
+    "Talleres esporádicos",
     "AlegreMente",
     "Muestras de Proceso - FSA"
   ],
@@ -399,6 +400,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
