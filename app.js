@@ -24,9 +24,10 @@ const CATS = {
     "Búsqueda de nuevas convocatorias"
   ],
   "Alianzas y convenios": [
-    "FSA",
-    "UD - LEA",
+    "Junta de Acción Comunal Pasadena",
     "FESICOL",
+    "UD - LEA",
+    "FSA",
     "AMESE",
     "Catálogo CCB - El Tiempo",
     "GoIntegro",
@@ -400,6 +401,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
