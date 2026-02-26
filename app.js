@@ -66,6 +66,7 @@ const CATS = {
     "Seguimiento de Egresos",
     "Plan Financiero",
     "Pagos pendientes",
+    "Seguimiento de Caja menor",
     "Solicitud de créditos y prétamos"
   ],
   "Académico": [
@@ -401,6 +402,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
