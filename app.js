@@ -64,6 +64,7 @@ const CATS = {
   "Contabilidad y Finanzas": [
     "Seguimiento de tareas pendientes",
     "Seguimiento de Egresos",
+    "Realización de Facturas DIAN",
     "Plan Financiero",
     "Pagos pendientes",
     "Seguimiento de Caja menor",
@@ -402,6 +403,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
