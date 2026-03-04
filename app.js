@@ -87,6 +87,7 @@ const CATS = {
   "Legal": [
     "Licencia de Secretaría de Educación",
     "Actualización y mejora de contratos vigentes",
+    "Revision y envío de actas de reuniones pendientes",
     "Actualización y mejora del reglamento interno de trabajo",
     "Seguimiento trámites legales (cámaras/SEC)"
   ],
@@ -403,6 +404,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
