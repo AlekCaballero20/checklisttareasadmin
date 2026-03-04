@@ -89,7 +89,7 @@ const CATS = {
     "Actualización y mejora de contratos vigentes",
     "Revision y envío de actas de reuniones pendientes",
     "Actualización y mejora del reglamento interno de trabajo",
-    "Seguimiento trámites legales (cámaras/SEC)"
+    "Seguimiento de tareas o trámites pendientes"
   ],
   "Dirección": [
     "Revisión del Calendario Anual",
