@@ -28,7 +28,6 @@ const CATS = {
     "FESICOL",
     "UD - LEA",
     "FSA",
-    "AMESE",
     "Catálogo CCB - El Tiempo",
     "GoIntegro",
     "Fundación Corazón Peludito",
@@ -404,6 +403,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
