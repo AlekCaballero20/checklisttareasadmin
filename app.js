@@ -17,7 +17,8 @@ const CATS = {
     "Jornadas de trabajo",
     "Contratación (vacantes)",
     "Novedades de nómina",
-    "Radicación de Incapacidades"
+    "Radicación de Incapacidades",
+    "Seguimiento operativo"
   ],
   "Investigación (Convocatorias)": [
     "Seguimiento de postulaciones",
@@ -403,6 +404,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
