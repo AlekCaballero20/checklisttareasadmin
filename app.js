@@ -121,7 +121,7 @@ const CATS = {
   "Seguridad y Supervisión": [
     "Supervisión general de seguridad",
     "Seguimiento y prevención de situaciones de inseguridad",
-    "Revisión y mantenimiento de los elementos de seguridad"
+    "Revisión y mantenimiento de los elementos y sistemas de seguridad"
   ]
 };
 
@@ -403,6 +403,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
