@@ -22,6 +22,7 @@ const CATS = {
   ],
   "Investigación (Convocatorias)": [
     "Seguimiento de postulaciones",
+    "Catálogo CCB - El Tiempo",
     "Búsqueda de nuevas convocatorias"
   ],
   "Alianzas y convenios": [
@@ -29,7 +30,6 @@ const CATS = {
     "FESICOL",
     "UD - LEA",
     "FSA",
-    "Catálogo CCB - El Tiempo",
     "GoIntegro",
     "Fundación Corazón Peludito",
     "Fundación Gatitus",
@@ -404,6 +404,7 @@ function maybeNotifyAllCovered(data){
 
 // 12) Arranque
 ensureInit().then(startLive);
+
 
 
 
