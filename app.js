@@ -72,6 +72,7 @@ const CATS = {
     "Solicitud de créditos y prétamos"
   ],
   "Académico": [
+    "Sistema de registro y seguimiento",
     "Programas Online",
     "Creación de contenido",
     "Seguimiento a docentes y novedades",
