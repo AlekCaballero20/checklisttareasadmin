@@ -107,6 +107,7 @@ const CATS = {
   "Seguridad y Salud en el Trabajo": [
     "Comité de Convivencia Laboral (CCL)",
     "Verificación de incidentes / novedades",
+    "Seguimiento de Botiquines",
     "Tareas SG-SST programadas"
   ],
   "Organización y Servicios Generales": [
