@@ -49,6 +49,7 @@ const CATS = {
     "Buscar nuevas alianzas y convenios"
   ],
   "Atención al Cliente y Ventas": [
+    "MusiBot",
     "Seguimiento a Mensajes de WhatsApp y Keybe",
     "Seguimiento a Correos electrónicos",
     "Seguimiento a clientes potenciales",
