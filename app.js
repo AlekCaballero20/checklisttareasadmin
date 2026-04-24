@@ -50,10 +50,9 @@ const CATS = {
   ],
   "Atención al Cliente y Ventas": [
     "MusiBot",
-    "Seguimiento a Mensajes de WhatsApp y Keybe",
+    "Seguimiento a todos los canales",
     "Seguimiento a Correos electrónicos",
     "Seguimiento a clientes potenciales",
-    "Mejora del Flujo de Comunicación de Keybe",
     "Mejora de los aplicativos web de Atención al Cliente y Ventas",
     "Seguimiento de pendientes en el Calendario"
   ],
