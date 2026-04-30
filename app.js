@@ -63,11 +63,10 @@ const CATS = {
   ],
   "Contabilidad y Finanzas": [
     "Seguimiento de tareas pendientes",
-    "Seguimiento de Pagos",
+    "Seguimiento de Facturas y Pagos",
     "Seguimiento de Egresos",
     "Realización de Facturas DIAN",
     "Plan Financiero",
-    "Pagos pendientes",
     "Seguimiento de Caja menor",
     "Solicitud de créditos y prétamos"
   ],
