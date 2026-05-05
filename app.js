@@ -81,7 +81,7 @@ const CATS = {
     "Musicala Fest",
     "Muestras de Proceso - Musicala",
     "Talleres esporádicos",
-    "AlegreMente",
+    "Salvemoslos del Reggaeton",
     "Muestras de Proceso - FSA"
   ],
   "Legal": [
