@@ -96,6 +96,7 @@ const CATS = {
     "Revisión de prioridades del día",
     "Seguimiento a indicadores clave (KPI's)",
     "Seguimiento de PQRS",
+    "Búsqueda o confirmación de ubicación de trabajo",
     "Aprobación de decisiones urgentes"
   ],
   "Gerencia y administración": [
