@@ -1,4 +1,7 @@
-// 1) Config Firebase (tu config)
+// Radar Gerencial — Musicala
+// App estática conectada a Firebase Realtime Database.
+// Pensada para Alek y Cata: cubrir todos los frentes de la empresa sin duplicarse ni dejar áreas en el limbo, ese deporte extremo administrativo.
+
 const firebaseConfig = {
   apiKey: "AIzaSyA_ubaKFH-QTf2ckIjYkxr-OsLQK1sLfKg",
   authDomain: "cheklist-tareas-admin.firebaseapp.com",
@@ -8,435 +11,949 @@ const firebaseConfig = {
   messagingSenderId: "73174483631",
   appId: "1:73174483631:web:caa41ba359fbeb8d55ca5a"
 };
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// 2) Definición de CATEGORÍAS y SUBTAREAS (tu versión)
-const CATS = {
-  "Recursos Humanos": [
-    "Jornadas de trabajo",
-    "Contratación (vacantes)",
-    "Novedades de nómina",
-    "Radicación de Incapacidades",
-    "Seguimiento operativo"
-  ],
-  "Investigación (Convocatorias)": [
-    "Seguimiento de postulaciones",
-    "Catálogo CCB - El Tiempo",
-    "Búsqueda de nuevas convocatorias"
-  ],
-  "Alianzas y convenios": [
-    "Junta de Acción Comunal Pasadena",
-    "FESICOL",
-    "UD - LEA",
-    "FSA",
-    "GoIntegro",
-    "Fundación Corazón Peludito",
-    "Fundación Gatitus",
-    "FONEH",
-    "Son Geniales",
-    "Faber Castell",
-    "British Columbia Group",
-    "Addi",
-    "Bold",
-    "Full 80's",
-    "Young Engineers",
-    "Gestionarte",
-    "chatholamaestro",
-    "Safe Mode",
-    "Controversia",
-    "Bionic",
-    "Buscar nuevas alianzas y convenios"
-  ],
-  "Atención al Cliente y Ventas": [
-    "MusiBot",
-    "Seguimiento a todos los canales",
-    "Seguimiento a Correos electrónicos",
-    "Seguimiento a clientes potenciales",
-    "Mejora de los aplicativos web de Atención al Cliente y Ventas",
-    "Seguimiento de pendientes en el Calendario"
-  ],
-  "Diseño y Marketing": [
-    "Revisión y mejora de campañas activas",
-    "Revisión y mejora de la Página Web",
-    "Seguimiento contenido para Redes Sociales"
-  ],
-  "Contabilidad y Finanzas": [
-    "Seguimiento de tareas pendientes",
-    "Seguimiento de Facturas y Pagos",
-    "Plan Financiero",
-    "Seguimiento de Egresos",
-    "Realización de Facturas DIAN",
-    "Seguimiento de Caja menor",
-    "Solicitud de créditos y prétamos"
-  ],
-  "Académico": [
-    "Sistema de registro y seguimiento",
-    "Programas Online",
-    "Creación de contenido",
-    "Seguimiento a docentes y novedades",
-    "Vacaciones artísticas"
-  ],
-  "Eventos y Actividades": [
-    "Musicala Fest",
-    "Muestras de Proceso - Musicala",
-    "Talleres esporádicos",
-    "Salvemoslos del Reggaeton",
-    "Muestras de Proceso - FSA"
-  ],
-  "Legal": [
-    "Licencia de Secretaría de Educación",
-    "Actualización y mejora de contratos vigentes",
-    "Revision y envío de actas de reuniones pendientes",
-    "Actualización y mejora del reglamento interno de trabajo",
-    "Seguimiento de tareas o trámites pendientes"
-  ],
-  "Dirección": [
-    "Revisión del Calendario Anual",
-    "Revisión de prioridades del día",
-    "Seguimiento a indicadores clave (KPI's)",
-    "Seguimiento de PQRS",
-    "Búsqueda o confirmación de ubicación de trabajo",
-    "Aprobación de decisiones urgentes"
-  ],
-  "Gerencia y administración": [
-    "Agenda y Tareas de equipo",
-    "Revisión de mensajes y correos (pendientes críticos)"
-  ],
-  "Seguridad y Salud en el Trabajo": [
-    "Comité de Convivencia Laboral (CCL)",
-    "Verificación de incidentes / novedades",
-    "Seguimiento de Botiquines",
-    "Tareas SG-SST programadas"
-  ],
-  "Organización y Servicios Generales": [
-    "Aseo y orden de espacios",
-    "Inventario básico (papelería / limpieza)",
-    "Solicitudes de mantenimiento"
-  ],
-  "Acción Social y Comunitaria": [
-    "Contactos y alianzas"
-  ],
-  "Compras": [
-    "Revisión de compras pendientes",
-    "Registro de factura / soporte"
-  ],
-  "Seguridad y Supervisión": [
-    "Supervisión general de seguridad",
-    "Seguimiento y prevención de situaciones de inseguridad",
-    "Revisión y mantenimiento de los elementos y sistemas de seguridad"
-  ]
+const PEOPLE = ["Alek", "Cata"];
+const ROOT_PATH = "checklistCurrentV3_radarGerencial";
+const HISTORY_PATH = "checklistHistoryV3_radarGerencial";
+
+const AREAS = [
+  {
+    title: "Dirección",
+    emoji: "🧭",
+    weight: 1,
+    hint: "Prioridades, calendario, KPI, PQRS y decisiones urgentes.",
+    tasks: [
+      "Revisión de prioridades del día",
+      "Seguimiento a indicadores clave (KPI's)",
+      "Seguimiento de PQRS",
+      "Aprobación de decisiones urgentes",
+      "Revisión del Calendario Anual"
+    ]
+  },
+  {
+    title: "Contabilidad y Finanzas",
+    emoji: "💰",
+    weight: 2,
+    hint: "Caja, pagos, ingresos, créditos y salud financiera.",
+    tasks: [
+      "Flujo de caja del día",
+      "Pagos o ingresos registrados",
+      "Plan financiero",
+      "Cuentas por pagar y cobrar",
+      "Solicitud de créditos y préstamos"
+    ]
+  },
+  {
+    title: "Atención al Cliente y Ventas",
+    emoji: "📲",
+    weight: 3,
+    hint: "Mensajes, leads, correos y oportunidades comerciales.",
+    tasks: [
+      "Seguimiento a mensajes de WhatsApp y Keybe",
+      "Seguimiento a correos electrónicos",
+      "Seguimiento a clientes potenciales",
+      "Revisión de oportunidades sin respuesta",
+      "Mejora del flujo de comunicación de Keybe"
+    ]
+  },
+  {
+    title: "Diseño y Marketing",
+    emoji: "🎨",
+    weight: 4,
+    hint: "Campañas, contenido, pauta, marca y próximos lanzamientos.",
+    tasks: [
+      "Revisión de campañas activas",
+      "Actualizar contenido para marketing",
+      "Revisión de métricas de pauta",
+      "Ideas de contenido para redes",
+      "Revisión de piezas pendientes"
+    ]
+  },
+  {
+    title: "Académico",
+    emoji: "🎼",
+    weight: 5,
+    hint: "Programación, docentes, estudiantes, procesos y calidad pedagógica.",
+    tasks: [
+      "Seguimiento a docentes y novedades",
+      "Revisión de programación académica",
+      "Seguimiento a estudiantes o familias especiales",
+      "Revisión de tareas académicas pendientes",
+      "Programas online"
+    ]
+  },
+  {
+    title: "Recursos Humanos",
+    emoji: "🤝",
+    weight: 6,
+    hint: "Equipo, contratación, jornadas, novedades y comunicación interna.",
+    tasks: [
+      "Comunicación con equipo (avisos)",
+      "Novedades de nómina",
+      "Contratación",
+      "Jornadas de trabajo",
+      "Radicación de incapacidades"
+    ]
+  },
+  {
+    title: "Alianzas y convenios",
+    emoji: "🌉",
+    weight: 7,
+    hint: "FSA, marcas aliadas, convenios y oportunidades externas.",
+    tasks: [
+      "FSA",
+      "FESICOL",
+      "AMESE",
+      "GoIntegro",
+      "FONEH",
+      "Son Geniales",
+      "Faber Castell",
+      "British Columbia Group",
+      "Addi",
+      "Bold",
+      "Full 80's",
+      "Gestionarte",
+      "chatholamaestro",
+      "Safe Mode",
+      "Controversia",
+      "Bionic",
+      "Buscar nuevas alianzas y convenios"
+    ]
+  },
+  {
+    title: "Eventos y Actividades",
+    emoji: "🎤",
+    weight: 8,
+    hint: "Muestras, festivales, vacacionales y experiencias especiales.",
+    tasks: [
+      "AlegreMente",
+      "Musicala Fest",
+      "Muestras de proceso",
+      "Vacacionales",
+      "Actividades especiales o alianzas"
+    ]
+  },
+  {
+    title: "Legal",
+    emoji: "⚖️",
+    weight: 9,
+    hint: "Licencias, contratos, trámites y respaldos formales.",
+    tasks: [
+      "Licencia de Secretaría de Educación",
+      "Verificación de contratos vigentes",
+      "Seguimiento trámites (Cámara de Comercio / SEC)",
+      "Revisión de documentos pendientes",
+      "Soportes legales por archivar"
+    ]
+  },
+  {
+    title: "Gerencia y administración",
+    emoji: "🗂️",
+    weight: 10,
+    hint: "Agenda, bandejas, operación diaria y pendientes críticos.",
+    tasks: [
+      "Agenda y tareas de equipo",
+      "Revisión de bandeja de pendientes críticos",
+      "Compra menor / gestiones administrativas",
+      "Revisión de documentos por enviar",
+      "Organización de tareas de la semana"
+    ]
+  },
+  {
+    title: "Seguridad y Salud en el Trabajo",
+    emoji: "🦺",
+    weight: 11,
+    hint: "SG-SST, incidentes, Safe Mode y responsabilidades laborales.",
+    tasks: [
+      "Comité de Convivencia Laboral (CCL)",
+      "Verificación de incidentes / novedades",
+      "Tareas SG-SST programadas hoy",
+      "Seguimiento Safe Mode",
+      "Soportes o reportes SG-SST"
+    ]
+  },
+  {
+    title: "Organización y Servicios Generales",
+    emoji: "🧹",
+    weight: 12,
+    hint: "Aseo, orden, inventario, mantenimiento y espacios.",
+    tasks: [
+      "Aseo y orden de espacios",
+      "Inventario básico (papelería / limpieza)",
+      "Solicitudes de mantenimiento",
+      "Revisión de salones y recepción",
+      "Elementos por comprar o reponer"
+    ]
+  },
+  {
+    title: "Acción Social y Comunitaria",
+    emoji: "🌱",
+    weight: 13,
+    hint: "Centros, comunidad, casos especiales y acciones con impacto.",
+    tasks: [
+      "Contacto con comunidad/centros",
+      "Seguimiento a casos especiales",
+      "Registro de acciones del día",
+      "Pendientes con líderes o aliados sociales",
+      "Evidencias por organizar"
+    ]
+  },
+  {
+    title: "Investigación y Convocatorias",
+    emoji: "🔎",
+    weight: 14,
+    hint: "Convocatorias, oportunidades, postulaciones y crecimiento.",
+    tasks: [
+      "Búsqueda de nuevas convocatorias",
+      "Seguimiento de postulaciones",
+      "Revisión de requisitos",
+      "Ideas de proyectos postulables",
+      "Documentos base para convocatorias"
+    ]
+  },
+  {
+    title: "Compras",
+    emoji: "🛒",
+    weight: 15,
+    hint: "Necesidades, cotizaciones, compras menores y facturas.",
+    tasks: [
+      "Revisión de necesidades urgentes",
+      "Cotización / compra menor",
+      "Registro de factura / soporte",
+      "Comparación de proveedores",
+      "Seguimiento a entregas"
+    ]
+  },
+  {
+    title: "Seguridad y Supervisión",
+    emoji: "🛡️",
+    weight: 16,
+    hint: "Prevención, infraestructura, riesgos y seguridad de la sede.",
+    tasks: [
+      "Supervisión general de seguridad",
+      "Seguimiento y prevención de situaciones de inseguridad",
+      "Revisión y mantenimiento de los elementos de seguridad",
+      "Revisión de accesos y cierres",
+      "Novedades de seguridad por registrar"
+    ]
+  }
+];
+
+const $ = (q) => document.querySelector(q);
+const $$ = (q) => Array.from(document.querySelectorAll(q));
+
+const state = {
+  data: null,
+  open: {},
+  search: "",
+  filter: "all",
+  sort: "radar",
+  highlighted: null,
+  lastSavedNotes: {}
 };
 
-// 3) Utils generales
-const $ = (q) => document.querySelector(q);
-const todayStr = new Date().toISOString().slice(0,10);
-$("#today").textContent = todayStr;
-
-// RTDB no permite . # $ / [ ] — sanitizamos claves
-const keyize = (s) => s
-  .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-  .replace(/[.#$/\[\]]/g, "_")
-  .replace(/\s+/g, "_")
-  .toLowerCase();
-
-const ROOT_PATH = "checklistCurrentV2";
-
-// Estado UI: categorías abiertas/cerradas (no se guarda en DB)
-const OPEN = {}; // { [catKey]: true | false }
-
-// Para no duplicar el aviso de “todas cubiertas” por cliente
-let localNotifiedAllCovered = false;
-
-// 4) Inicialización con claves seguras
-async function ensureInit(){
-  const snap = await db.ref(ROOT_PATH).get();
-  if (!snap.exists()){
-    const categories = {};
-    Object.keys(CATS).forEach(catLabel=>{
-      const catKey = keyize(catLabel);
-      categories[catKey] = { title: catLabel, tasks: {} };
-      CATS[catLabel].forEach(taskLabel=>{
-        const taskKey = keyize(taskLabel);
-        categories[catKey].tasks[taskKey] = {
-          label: taskLabel, done:false, by:null, time:null
-        };
-      });
-    });
-    await db.ref(ROOT_PATH).set({
-      dateLabel: todayStr,
-      categories,
-      updatedAt: Date.now(),
-      allCoveredAt: null
-    });
-  } else {
-    // Patch por si agregaste/renombraste en CATS
-    const val = snap.val();
-    const categories = val.categories || {};
-    let changed = false;
-
-    Object.keys(CATS).forEach(catLabel=>{
-      const catKey = keyize(catLabel);
-      if (!categories[catKey]) {
-        categories[catKey] = { title: catLabel, tasks: {} };
-        changed = true;
-      } else if (categories[catKey].title !== catLabel) {
-        categories[catKey].title = catLabel;
-        changed = true;
-      }
-      const tasks = categories[catKey].tasks || {};
-      CATS[catLabel].forEach(taskLabel=>{
-        const taskKey = keyize(taskLabel);
-        if (!tasks[taskKey]) {
-          tasks[taskKey] = { label: taskLabel, done:false, by:null, time:null };
-          changed = true;
-        } else if (tasks[taskKey].label !== taskLabel) {
-          tasks[taskKey].label = taskLabel;
-          changed = true;
-        }
-      });
-      categories[catKey].tasks = tasks;
-    });
-
-    if (changed){
-      await db.ref(`${ROOT_PATH}/categories`).set(categories);
-      await db.ref(`${ROOT_PATH}/updatedAt`).set(Date.now());
-    }
-  }
+function escapeHTML(value = ""){
+  return String(value).replace(/[&<>'"]/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#039;",
+    '"': "&quot;"
+  }[char]));
 }
 
-// 5) Escucha en vivo
-function startLive(){
-  db.ref(ROOT_PATH).on("value", (snap)=>{
-    const data = snap.val(); if(!data) return;
-    renderAll(data.categories || {});
-    updateGlobalProgress(data.categories || {});
-    maybeNotifyAllCovered(data);
+function keyize(value){
+  return String(value)
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[.#$/\[\]]/g, "_")
+    .replace(/\s+/g, "_")
+    .toLowerCase();
+}
+
+function getTodayColombia(){
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
+
+function formatDateTime(timestamp){
+  if (!timestamp) return "";
+  const d = new Date(timestamp);
+  const fecha = d.toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
+  const hora = d.toLocaleTimeString("es-CO", {
+    timeZone: "America/Bogota",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+  return `${fecha} ${hora}`;
+}
+
+function formatTime(timestamp){
+  if (!timestamp) return "";
+  return new Date(timestamp).toLocaleTimeString("es-CO", {
+    timeZone: "America/Bogota",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
   });
 }
 
-// 6) Render (con clase .collapsed y delegación)
-function renderAll(categories){
+function defaultPriority(areaTitle, taskLabel){
+  const text = `${areaTitle} ${taskLabel}`.toLowerCase();
+  if (/flujo de caja|pagos|ingresos|pqrs|decisiones urgentes|cliente|ventas|incapacidades|contrataci|legal|licencia|sg-sst|seguridad|safe mode/.test(text)) return "alta";
+  if (/campañas|indicadores|docentes|programaci|nómina|contratos|convenios|eventos|compras|convocatorias/.test(text)) return "media";
+  return "baja";
+}
+
+function createTask(areaTitle, label, previous = {}){
+  return {
+    label,
+    done: Boolean(previous.done),
+    by: previous.by && PEOPLE.includes(previous.by) ? previous.by : (previous.by === "Ambos" ? "Alek" : null),
+    time: previous.time || previous.updatedAt || null,
+    updatedAt: previous.updatedAt || previous.time || null,
+    notes: previous.notes || "",
+    priority: previous.priority || defaultPriority(areaTitle, label)
+  };
+}
+
+function createFreshCategories(previousCategories = {}){
+  const categories = {};
+  AREAS.forEach((area) => {
+    const catKey = keyize(area.title);
+    const previousCat = previousCategories[catKey] || {};
+    categories[catKey] = {
+      title: area.title,
+      emoji: area.emoji,
+      hint: area.hint,
+      weight: area.weight,
+      tasks: {}
+    };
+    area.tasks.forEach((taskLabel) => {
+      const taskKey = keyize(taskLabel);
+      const previousTask = previousCat.tasks?.[taskKey] || {};
+      categories[catKey].tasks[taskKey] = createTask(area.title, taskLabel, previousTask);
+    });
+  });
+  return categories;
+}
+
+function createBlankCategories(){
+  const categories = {};
+  AREAS.forEach((area) => {
+    const catKey = keyize(area.title);
+    categories[catKey] = {
+      title: area.title,
+      emoji: area.emoji,
+      hint: area.hint,
+      weight: area.weight,
+      tasks: {}
+    };
+    area.tasks.forEach((taskLabel) => {
+      const taskKey = keyize(taskLabel);
+      categories[catKey].tasks[taskKey] = createTask(area.title, taskLabel);
+    });
+  });
+  return categories;
+}
+
+async function ensureInit(){
+  const today = getTodayColombia();
+  $("#today").textContent = today;
+
+  const snap = await db.ref(ROOT_PATH).get();
+  if (!snap.exists()){
+    await db.ref(ROOT_PATH).set({
+      dateLabel: today,
+      categories: createBlankCategories(),
+      updatedAt: Date.now(),
+      allAreasCoveredAt: null,
+      createdAt: Date.now()
+    });
+    return;
+  }
+
+  const current = snap.val() || {};
+  const patchedCategories = createFreshCategories(current.categories || {});
+  await db.ref(ROOT_PATH).update({
+    categories: patchedCategories,
+    updatedAt: current.updatedAt || Date.now(),
+    dateLabel: current.dateLabel || today
+  });
+}
+
+function startLive(){
+  db.ref(ROOT_PATH).on("value", (snap) => {
+    const data = snap.val();
+    if (!data) return;
+    state.data = data;
+    render(data);
+    maybeStampAllAreasCovered(data);
+  });
+}
+
+function flattenTasks(categories = {}){
+  const flat = [];
+  AREAS.forEach((area) => {
+    const catKey = keyize(area.title);
+    const catInfo = categories[catKey] || {};
+    area.tasks.forEach((taskLabel) => {
+      const taskKey = keyize(taskLabel);
+      const task = catInfo.tasks?.[taskKey] || createTask(area.title, taskLabel);
+      flat.push({
+        catKey,
+        taskKey,
+        catTitle: area.title,
+        emoji: area.emoji,
+        hint: area.hint,
+        weight: area.weight,
+        label: task.label || taskLabel,
+        done: Boolean(task.done),
+        by: task.by || null,
+        time: task.time || null,
+        updatedAt: task.updatedAt || task.time || null,
+        notes: task.notes || "",
+        priority: task.priority || defaultPriority(area.title, taskLabel)
+      });
+    });
+  });
+  return flat;
+}
+
+function areaStats(categories = {}){
+  return AREAS.map((area) => {
+    const catKey = keyize(area.title);
+    const tasks = area.tasks.map((label) => {
+      const taskKey = keyize(label);
+      return categories[catKey]?.tasks?.[taskKey] || createTask(area.title, label);
+    });
+    const total = tasks.length;
+    const done = tasks.filter((task) => task.done).length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const touched = done > 0;
+    const latest = tasks.filter(t => t.done && t.time).sort((a,b) => b.time - a.time)[0] || null;
+    return { ...area, catKey, total, done, pct, touched, latest };
+  });
+}
+
+function getMetrics(data){
+  const flat = flattenTasks(data.categories || {});
+  const areas = areaStats(data.categories || {});
+  const total = flat.length;
+  const done = flat.filter(t => t.done).length;
+  const pending = total - done;
+  const coveredAreas = areas.filter(a => a.touched).length;
+  const emptyAreas = areas.filter(a => !a.touched);
+  const latest = flat.filter(t => t.done && t.time).sort((a,b) => b.time - a.time)[0] || null;
+  const byPerson = PEOPLE.reduce((acc, person) => {
+    acc[person] = flat.filter(t => t.done && t.by === person).length;
+    return acc;
+  }, {});
+  const criticalPending = flat.filter(t => !t.done && t.priority === "alta").length;
+  const notesCount = flat.filter(t => t.notes?.trim()).length;
+  return { flat, areas, total, done, pending, coveredAreas, emptyAreas, latest, byPerson, criticalPending, notesCount };
+}
+
+function getAreaStatusClass(area){
+  if (area.done === 0) return "empty";
+  if (area.done < Math.ceil(area.total * .5)) return "partial";
+  return "covered";
+}
+
+function getAreaStatusText(area){
+  if (area.done === 0) return "Sin tocar";
+  if (area.done < Math.ceil(area.total * .5)) return "En radar";
+  return "Bien cubierta";
+}
+
+function pickNextTaskFor(person, metrics, avoidCatKey = null){
+  const pendingByArea = metrics.areas
+    .map(area => {
+      const pendingTasks = metrics.flat.filter(task => task.catKey === area.catKey && !task.done);
+      return { area, pendingTasks };
+    })
+    .filter(item => item.pendingTasks.length);
+
+  const priorityOrder = { alta: 1, media: 2, baja: 3 };
+  const untouched = pendingByArea
+    .filter(item => !item.area.touched)
+    .sort((a,b) => a.area.weight - b.area.weight);
+
+  const candidates = untouched.length
+    ? untouched
+    : pendingByArea.sort((a,b) => {
+        if (a.area.catKey === avoidCatKey && b.area.catKey !== avoidCatKey) return 1;
+        if (b.area.catKey === avoidCatKey && a.area.catKey !== avoidCatKey) return -1;
+        if (a.area.pct !== b.area.pct) return a.area.pct - b.area.pct;
+        return a.area.weight - b.area.weight;
+      });
+
+  if (!candidates.length) return null;
+
+  const chosenArea = candidates[0].area;
+  const task = candidates[0].pendingTasks.sort((a,b) => {
+    if (priorityOrder[a.priority] !== priorityOrder[b.priority]) return priorityOrder[a.priority] - priorityOrder[b.priority];
+    return a.label.localeCompare(b.label, "es");
+  })[0];
+
+  return {
+    person,
+    area: chosenArea,
+    task,
+    reason: untouched.length
+      ? "Esta área todavía no ha recibido atención hoy. El radar está señalando ese huequito, muy sutil él."
+      : "Es una de las áreas con menor avance pendiente. Mejor mirarla antes de que se vuelva incendio con logo."
+  };
+}
+
+function buildAlerts(metrics, data){
+  const alerts = [];
+  if (data.dateLabel && data.dateLabel !== getTodayColombia()){
+    alerts.push({ type: "warn", text: `El tablero todavía está en ${data.dateLabel}. Conviene abrir nuevo día.` });
+  }
+  if (metrics.emptyAreas.length){
+    alerts.push({ type: "warn", text: `${metrics.emptyAreas.length} áreas sin tocar` });
+  } else {
+    alerts.push({ type: "ok", text: "Todos los frentes tienen al menos una acción" });
+  }
+  if (metrics.criticalPending){
+    alerts.push({ type: "warn", text: `${metrics.criticalPending} pendientes de alta prioridad` });
+  }
+  const diff = Math.abs(metrics.byPerson.Alek - metrics.byPerson.Cata);
+  if (diff >= 3){
+    const behind = metrics.byPerson.Alek < metrics.byPerson.Cata ? "Alek" : "Cata";
+    alerts.push({ type: "info", text: `${behind} podría tomar la próxima para equilibrar carga` });
+  }
+  if (metrics.notesCount){
+    alerts.push({ type: "info", text: `${metrics.notesCount} tareas tienen notas` });
+  }
+  return alerts.slice(0, 4);
+}
+
+function render(data){
+  const metrics = getMetrics(data);
+  const latest = metrics.latest;
+  const otherPerson = latest?.by === "Alek" ? "Cata" : "Alek";
+  const mainSuggestion = pickNextTaskFor(otherPerson, metrics, latest?.catKey);
+  const alekSuggestion = pickNextTaskFor("Alek", metrics, latest?.catKey);
+  const cataSuggestion = pickNextTaskFor("Cata", metrics, latest?.catKey);
+
+  renderOldDayBanner(data);
+  renderHero(metrics, latest, mainSuggestion, data);
+  renderStats(metrics);
+  renderProgress(metrics);
+  renderPersonalSuggestions(alekSuggestion, cataSuggestion);
+  renderActivity(metrics);
+  renderCoverageMap(metrics);
+  renderCategories(data.categories || {}, metrics);
+}
+
+function renderOldDayBanner(data){
+  const banner = $("#oldDayBanner");
+  const today = getTodayColombia();
+  if (data.dateLabel && data.dateLabel !== today){
+    banner.classList.remove("hidden");
+    banner.textContent = `Este radar pertenece al ${data.dateLabel}. Hoy es ${today}. Dale “Nuevo día” para archivar y empezar limpio.`;
+  } else {
+    banner.classList.add("hidden");
+    banner.textContent = "";
+  }
+}
+
+function renderHero(metrics, latest, suggestion, data){
+  const headline = $("#mainHeadline");
+  const suggestionText = $("#mainSuggestion");
+  const lastAction = $("#lastAction");
+
+  if (!latest){
+    headline.textContent = "Arranquen por el radar principal";
+    const first = pickNextTaskFor($("#who").value, metrics);
+    suggestionText.textContent = first
+      ? `${first.person} podría empezar por ${first.area.emoji} ${first.area.title}: “${first.task.label}”. Así el día no empieza con la elegante estrategia de improvisar.`
+      : "Todo está cubierto. Sospechoso, pero agradable.";
+    lastAction.textContent = "Todavía no hay tareas marcadas hoy.";
+  } else {
+    const other = latest.by === "Alek" ? "Cata" : "Alek";
+    headline.textContent = `${latest.by} movió ${latest.emoji} ${latest.catTitle}`;
+    suggestionText.textContent = suggestion
+      ? `${latest.by} hizo “${latest.label}” a las ${formatTime(latest.time)}. Para balancear gerencia, ${other} podría mirar ${suggestion.area.emoji} ${suggestion.area.title}: “${suggestion.task.label}”.`
+      : `${latest.by} hizo “${latest.label}”. Ya no hay pendientes en el radar. Milagro administrativo, favor documentarlo.`;
+    lastAction.innerHTML = `<strong>${escapeHTML(latest.by)} hizo:</strong> ${escapeHTML(latest.label)}<br><small>${escapeHTML(latest.catTitle)} · ${escapeHTML(formatDateTime(latest.time))}</small>`;
+  }
+
+  const alerts = buildAlerts(metrics, data);
+  $("#smartAlerts").innerHTML = alerts.map(alert => `<span class="chip ${alert.type}">${escapeHTML(alert.text)}</span>`).join("");
+}
+
+function renderStats(metrics){
+  const taskPct = metrics.total ? Math.round(metrics.done / metrics.total * 100) : 0;
+  const areaPct = AREAS.length ? Math.round(metrics.coveredAreas / AREAS.length * 100) : 0;
+  const leader = metrics.byPerson.Alek === metrics.byPerson.Cata
+    ? "Empate"
+    : (metrics.byPerson.Alek > metrics.byPerson.Cata ? "Alek" : "Cata");
+
+  const cards = [
+    { n: `${areaPct}%`, label: "Cobertura de áreas", small: `${metrics.coveredAreas}/${AREAS.length} frentes abordados` },
+    { n: `${taskPct}%`, label: "Avance de tareas", small: `${metrics.done}/${metrics.total} completadas` },
+    { n: metrics.emptyAreas.length, label: "Áreas sin tocar", small: metrics.emptyAreas[0] ? `Primera: ${metrics.emptyAreas[0].title}` : "Todo tiene movimiento" },
+    { n: metrics.criticalPending, label: "Alta prioridad", small: "Pendientes sensibles" },
+    { n: metrics.byPerson.Alek, label: "Alek", small: "Tareas hechas hoy" },
+    { n: metrics.byPerson.Cata, label: "Cata", small: leader === "Empate" ? "Carga balanceada" : `Va adelante: ${leader}` }
+  ];
+
+  $("#statsGrid").innerHTML = cards.map(card => `
+    <article class="stat-card">
+      <strong>${escapeHTML(card.n)}</strong>
+      <span>${escapeHTML(card.label)}</span>
+      <small>${escapeHTML(card.small)}</small>
+    </article>
+  `).join("");
+}
+
+function renderProgress(metrics){
+  const areaPct = AREAS.length ? Math.round(metrics.coveredAreas / AREAS.length * 100) : 0;
+  $("#areaProgFill").style.width = `${areaPct}%`;
+  $("#areaPct").textContent = `${areaPct}%`;
+  $("#areaDetail").textContent = `${metrics.coveredAreas} de ${AREAS.length} áreas`;
+  $("#taskDetail").textContent = `${metrics.done} de ${metrics.total} tareas completadas`;
+  $("#balanceDetail").textContent = `Alek ${metrics.byPerson.Alek} · Cata ${metrics.byPerson.Cata}`;
+}
+
+function renderPersonalSuggestions(alekSuggestion, cataSuggestion){
+  fillSuggestion("alek", alekSuggestion);
+  fillSuggestion("cata", cataSuggestion);
+}
+
+function fillSuggestion(prefix, suggestion){
+  const title = $(`#${prefix}SuggestionTitle`);
+  const text = $(`#${prefix}SuggestionText`);
+  const btn = $(`#do${prefix === "alek" ? "Alek" : "Cata"}Suggestion`);
+
+  if (!suggestion){
+    title.textContent = "Sin pendientes";
+    text.textContent = "No hay una siguiente tarea clara. Esto pasa cada vez que el universo decide cooperar.";
+    btn.disabled = true;
+    return;
+  }
+  title.textContent = `${suggestion.area.emoji} ${suggestion.area.title}`;
+  text.textContent = `${suggestion.task.label}. ${suggestion.reason}`;
+  btn.disabled = false;
+  btn.dataset.catKey = suggestion.task.catKey;
+  btn.dataset.taskKey = suggestion.task.taskKey;
+  btn.dataset.person = suggestion.person;
+}
+
+function renderActivity(metrics){
+  const recent = metrics.flat
+    .filter(t => t.done && t.time)
+    .sort((a,b) => b.time - a.time)
+    .slice(0, 8);
+
+  if (!recent.length){
+    $("#activityFeed").innerHTML = `<div class="activity-item"><strong>Sin actividad</strong><small>El tablero está esperando que alguien haga algo. Dramático, pero cierto.</small></div>`;
+    return;
+  }
+
+  $("#activityFeed").innerHTML = recent.map(item => `
+    <div class="activity-item">
+      <strong>${escapeHTML(item.by || "—")} · ${escapeHTML(item.emoji)} ${escapeHTML(item.catTitle)}</strong>
+      <span>${escapeHTML(item.label)}</span><br>
+      <small>${escapeHTML(formatDateTime(item.time))}</small>
+    </div>
+  `).join("");
+}
+
+function renderCoverageMap(metrics){
+  $("#coverageMap").innerHTML = metrics.areas.map(area => {
+    const cls = getAreaStatusClass(area);
+    return `
+      <button class="coverage-item ${cls}" data-cat-key="${area.catKey}" title="Abrir ${escapeHTML(area.title)}">
+        <span><span class="dot"></span> ${escapeHTML(area.emoji)} ${escapeHTML(area.title)}</span>
+        <small>${area.done}/${area.total}</small>
+      </button>
+    `;
+  }).join("");
+}
+
+function renderCategories(categories, metrics){
   const wrap = $("#cats");
-  wrap.innerHTML = "";
   const catTmpl = $("#catTmpl");
   const taskTmpl = $("#taskTmpl");
+  const search = state.search.trim().toLowerCase();
+  const filter = state.filter;
+  const sortMode = state.sort;
 
-  Object.keys(CATS).forEach((catLabel)=>{
-    const catKey = keyize(catLabel);
-    const catInfo = categories[catKey] || { title: catLabel, tasks:{} };
+  let areas = [...metrics.areas];
+  if (sortMode === "progressLow"){
+    areas.sort((a,b) => a.pct - b.pct || a.weight - b.weight);
+  } else if (sortMode === "alpha"){
+    areas.sort((a,b) => a.title.localeCompare(b.title, "es"));
+  } else {
+    areas.sort((a,b) => {
+      if (a.touched !== b.touched) return a.touched ? 1 : -1;
+      return a.weight - b.weight;
+    });
+  }
 
+  wrap.innerHTML = "";
+
+  areas.forEach((area) => {
+    if (filter === "untouchedAreas" && area.touched) return;
+
+    const catInfo = categories[area.catKey] || {};
     const catNode = catTmpl.content.cloneNode(true);
-    const section  = catNode.querySelector(".cat");
-    const titleEl  = catNode.querySelector(".catTitle");
-    const toggle   = catNode.querySelector(".toggleBtn");
-    const tasksEl  = catNode.querySelector(".tasks");
-    const catFill  = catNode.querySelector(".catProgressFill");
-    const catMeta  = catNode.querySelector(".catMeta");
+    const section = catNode.querySelector(".cat");
+    const titleEl = catNode.querySelector(".catTitle");
+    const hintEl = catNode.querySelector(".catHint");
+    const toggle = catNode.querySelector(".toggleBtn");
+    const tasksEl = catNode.querySelector(".tasks");
+    const catFill = catNode.querySelector(".catProgressFill");
+    const catMeta = catNode.querySelector(".catMeta");
+    const catStatus = catNode.querySelector(".catStatus");
 
-    // Para el toggle por delegación
-    section.dataset.catKey = catKey;
+    section.dataset.catKey = area.catKey;
+    titleEl.textContent = `${area.emoji} ${area.title}`;
+    hintEl.textContent = area.hint;
+    catFill.style.width = `${area.pct}%`;
+    catMeta.textContent = `${area.done} / ${area.total}`;
+    const statusClass = getAreaStatusClass(area);
+    catStatus.className = `catStatus ${statusClass}`;
+    catStatus.textContent = getAreaStatusText(area);
 
-    titleEl.textContent = catInfo.title || catLabel;
+    // Subtareas comprimidas por defecto para buscar más fácil.
+    // Si hay búsqueda o filtro activo, se expanden para mostrar resultados.
+    const hasQuery = Boolean(search) || (filter && filter !== "all");
+    const isOpen = hasQuery ? true : (state.open[area.catKey] ?? false);
+    section.classList.toggle("collapsed", !isOpen);
+    toggle.textContent = isOpen ? "▾" : "▸";
 
-    // Construir tareas
-    let total = 0, done = 0;
-    CATS[catLabel].forEach((taskLabel)=>{
+    let added = 0;
+    area.tasks.forEach((taskLabel) => {
       const taskKey = keyize(taskLabel);
-      const info = (catInfo.tasks && catInfo.tasks[taskKey]) || { label: taskLabel, done:false, by:null, time:null };
-      total++; if (info.done) done++;
+      const rawTask = catInfo.tasks?.[taskKey] || createTask(area.title, taskLabel);
+      const info = {
+        catKey: area.catKey,
+        taskKey,
+        catTitle: area.title,
+        label: rawTask.label || taskLabel,
+        done: Boolean(rawTask.done),
+        by: rawTask.by || null,
+        time: rawTask.time || null,
+        notes: rawTask.notes || "",
+        priority: rawTask.priority || defaultPriority(area.title, taskLabel)
+      };
+
+      if (!passesFilter(info, area, filter, search)) return;
+      added++;
 
       const tNode = taskTmpl.content.cloneNode(true);
-      const chk   = tNode.querySelector(".chk");
-      const name  = tNode.querySelector(".taskName");
-      const byEl  = tNode.querySelector(".by");
-      const timeEl= tNode.querySelector(".time");
+      const taskDiv = tNode.querySelector(".task");
+      const chk = tNode.querySelector(".chk");
+      const name = tNode.querySelector(".taskName");
+      const byEl = tNode.querySelector(".by");
+      const timeEl = tNode.querySelector(".time");
+      const note = tNode.querySelector(".note");
+      const priority = tNode.querySelector(".priority-pill");
 
-      name.textContent = info.label || taskLabel;
-      chk.checked = !!info.done;
-      byEl.textContent = info.by ? `Hecho por: ${info.by}` : "—";
-
-      // ⬇️ ÚNICO CAMBIO: mostrar fecha + hora (12h) cuando existe `time`
-      if (info.time) {
-        const d = new Date(info.time);
-        const fecha = d.toLocaleDateString("es-CO"); // p.ej. 20/10/2025
-        const hora  = d.toLocaleTimeString("es-CO", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true
-        }); // p.ej. 11:32 a. m.
-        timeEl.textContent = `${fecha} ${hora}`;
-      } else {
-        timeEl.textContent = "";
-      }
-      // ⬆️ Fin del cambio
-
-      chk.dataset.catKey = catKey;
+      taskDiv.dataset.catKey = area.catKey;
+      taskDiv.dataset.taskKey = taskKey;
+      taskDiv.classList.toggle("done", info.done);
+      taskDiv.classList.toggle("suggested", state.highlighted?.catKey === area.catKey && state.highlighted?.taskKey === taskKey);
+      chk.checked = info.done;
+      chk.dataset.catKey = area.catKey;
       chk.dataset.taskKey = taskKey;
-      chk.addEventListener("change", async (e)=>{
-        const who = $("#who").value;
-        await updateTask(e.target.dataset.catKey, e.target.dataset.taskKey, chk.checked ? who : null);
-      });
+      name.textContent = info.label;
+      byEl.textContent = info.by ? `Hecho por: ${info.by}` : "Pendiente";
+      timeEl.textContent = info.time ? formatDateTime(info.time) : "";
+      note.value = info.notes || "";
+      note.dataset.catKey = area.catKey;
+      note.dataset.taskKey = taskKey;
+      priority.textContent = `Prioridad ${info.priority}`;
+      priority.className = `priority-pill ${info.priority}`;
 
       tasksEl.appendChild(tNode);
     });
 
-    // Progreso por categoría
-    const pct = total ? Math.round((done/total)*100) : 0;
-    catFill.style.width = pct + "%";
-    catMeta.textContent = `${done} / ${total}`;
-
-    // Estado de apertura (clase .collapsed)
-    const isOpen = OPEN[catKey] ?? false;
-    section.classList.toggle("collapsed", !isOpen);
-    toggle.textContent = isOpen ? "▾" : "▸";
+    if (added === 0){
+      tasksEl.innerHTML = `<div class="task"><strong>No hay tareas con ese filtro.</strong><div class="task-tools">El filtro está siendo más estricto que portería de colegio.</div></div>`;
+    }
 
     wrap.appendChild(catNode);
   });
-}
 
-// Delegación para toggles (no se rompe con re-render)
-document.getElementById("cats").addEventListener("click", (e)=>{
-  const btn = e.target.closest(".toggleBtn");
-  if (!btn) return;
-  const section = btn.closest(".cat");
-  const catKey = section?.dataset?.catKey;
-  if (!catKey) return;
-
-  const nowOpen = !(OPEN[catKey] ?? false);
-  OPEN[catKey] = nowOpen;
-  section.classList.toggle("collapsed", !nowOpen);
-  btn.textContent = nowOpen ? "▾" : "▸";
-});
-
-// 7) Progreso global (por tareas)
-function updateGlobalProgress(categories){
-  let total = 0, done = 0;
-  Object.keys(CATS).forEach(catLabel=>{
-    const catKey = keyize(catLabel);
-    CATS[catLabel].forEach(taskLabel=>{
-      const taskKey = keyize(taskLabel);
-      total++;
-      if (categories?.[catKey]?.tasks?.[taskKey]?.done) done++;
-    });
-  });
-  const pct = total ? Math.round((done/total)*100) : 0;
-  $("#progFill").style.width = pct + "%";
-  $("#progPct").textContent = pct + "%";
-  $("#progDetail").textContent = `${done} de ${total} tareas`;
-}
-
-// 8) Escritura de cada tarea
-async function updateTask(catKey, taskKey, whoOrNull){
-  const isDone = !!whoOrNull;
-  await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).update({
-    done: isDone,
-    by: isDone ? whoOrNull : null,
-    time: isDone ? Date.now() : null
-  });
-  await db.ref(`${ROOT_PATH}/updatedAt`).set(Date.now());
-}
-
-// 9) Expandir/Contraer todo (manteniendo estado + clase)
-$("#expandAll").addEventListener("click", ()=>{
-  Object.keys(CATS).forEach(catLabel=>{
-    OPEN[keyize(catLabel)] = true;
-  });
-  document.querySelectorAll(".cat").forEach(sec=>{
-    sec.classList.remove("collapsed");
-    const btn = sec.querySelector(".toggleBtn");
-    if (btn) btn.textContent = "▾";
-  });
-});
-
-$("#collapseAll").addEventListener("click", ()=>{
-  Object.keys(CATS).forEach(catLabel=>{
-    OPEN[keyize(catLabel)] = false;
-  });
-  document.querySelectorAll(".cat").forEach(sec=>{
-    sec.classList.add("collapsed");
-    const btn = sec.querySelector(".toggleBtn");
-    if (btn) btn.textContent = "▸";
-  });
-});
-
-// 10) Reiniciar día
-$("#resetDay").addEventListener("click", async ()=>{
-  if (!confirm("¿Reiniciar todo en blanco?")) return;
-  const categories = {};
-  Object.keys(CATS).forEach(catLabel=>{
-    const catKey = keyize(catLabel);
-    categories[catKey] = { title: catLabel, tasks:{} };
-    CATS[catLabel].forEach(taskLabel=>{
-      const taskKey = keyize(taskLabel);
-      categories[catKey].tasks[taskKey] = { label: taskLabel, done:false, by:null, time:null };
-    });
-  });
-  localNotifiedAllCovered = false;
-  await db.ref(ROOT_PATH).update({
-    categories,
-    dateLabel: todayStr,
-    updatedAt: Date.now(),
-    allCoveredAt: null
-  });
-});
-
-// 11) Aviso cuando TODAS las categorías tienen >= 1 tarea hecha
-function maybeNotifyAllCovered(data){
-  const categories = data.categories || {};
-  const totalCats = Object.keys(CATS).length;
-
-  let covered = 0;
-  Object.keys(CATS).forEach(catLabel=>{
-    const catKey = keyize(catLabel);
-    const tasks = categories?.[catKey]?.tasks || {};
-    const hasOne = Object.values(tasks).some(t => t && t.done);
-    if (hasOne) covered++;
-  });
-
-  const allCovered = covered === totalCats;
-  const alreadyStamped = !!data.allCoveredAt;
-
-  if (allCovered && !alreadyStamped && !localNotifiedAllCovered){
-    localNotifiedAllCovered = true;
-    db.ref(`${ROOT_PATH}/allCoveredAt`).set(Date.now());
-    alert("🎉 ¡Día cubierto! Cada categoría tiene al menos una tarea realizada. ¡Brutales!");
+  if (!wrap.children.length){
+    wrap.innerHTML = `<section class="cat"><strong>No hay resultados.</strong><p class="catHint">Prueba limpiar búsqueda o cambiar el filtro.</p></section>`;
   }
 }
 
-// 12) Arranque
-ensureInit().then(startLive);
+function passesFilter(task, area, filter, search){
+  const haystack = `${task.label} ${task.catTitle} ${task.by || ""} ${task.notes || ""}`.toLowerCase();
+  if (search && !haystack.includes(search)) return false;
+  if (filter === "pending" && task.done) return false;
+  if (filter === "done" && !task.done) return false;
+  if (filter === "critical" && (task.done || task.priority !== "alta")) return false;
+  if (filter === "alek" && task.by !== "Alek") return false;
+  if (filter === "cata" && task.by !== "Cata") return false;
+  if (filter === "untouchedAreas" && area.touched) return false;
+  return true;
+}
 
+async function updateTask(catKey, taskKey, done){
+  const who = $("#who").value;
+  const payload = {
+    done,
+    by: done ? who : null,
+    time: done ? Date.now() : null,
+    updatedAt: Date.now()
+  };
+  await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).update(payload);
+  await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+}
 
+async function updateNote(catKey, taskKey, notes){
+  const cleanNotes = notes.trim();
+  const noteKey = `${catKey}/${taskKey}`;
+  if (state.lastSavedNotes[noteKey] === cleanNotes) return;
+  state.lastSavedNotes[noteKey] = cleanNotes;
+  await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).update({
+    notes: cleanNotes,
+    updatedAt: Date.now()
+  });
+  await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+}
 
+async function resetDay(){
+  if (!state.data) return;
+  const ok = confirm("¿Archivar el radar actual y empezar un nuevo día en blanco?");
+  if (!ok) return;
+  const today = getTodayColombia();
+  const archiveKey = `${state.data.dateLabel || today}_${Date.now()}`;
+  await db.ref(`${HISTORY_PATH}/${archiveKey}`).set({
+    ...state.data,
+    archivedAt: Date.now(),
+    archivedFrom: ROOT_PATH
+  });
+  state.open = {};
+  state.highlighted = null;
+  await db.ref(ROOT_PATH).set({
+    dateLabel: today,
+    categories: createBlankCategories(),
+    updatedAt: Date.now(),
+    allAreasCoveredAt: null,
+    createdAt: Date.now()
+  });
+}
 
+async function maybeStampAllAreasCovered(data){
+  const metrics = getMetrics(data);
+  const allCovered = metrics.coveredAreas === AREAS.length;
+  if (allCovered && !data.allAreasCoveredAt){
+    await db.ref(`${ROOT_PATH}/allAreasCoveredAt`).set(Date.now());
+    setTimeout(() => alert("🎉 Radar cubierto: todos los frentes de Musicala tienen al menos una acción hoy. No es paz mundial, pero ayuda."), 100);
+  }
+}
 
+function openAndHighlight(catKey, taskKey, person = null){
+  state.open[catKey] = true;
+  state.highlighted = { catKey, taskKey };
+  if (person) $("#who").value = person;
+  render(state.data);
+  requestAnimationFrame(() => {
+    const el = document.querySelector(`.task[data-cat-key="${CSS.escape(catKey)}"][data-task-key="${CSS.escape(taskKey)}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
 
+$("#cats").addEventListener("click", (event) => {
+  const toggle = event.target.closest(".toggleBtn");
+  if (!toggle) return;
+  const section = toggle.closest(".cat");
+  const catKey = section?.dataset.catKey;
+  if (!catKey) return;
+  state.open[catKey] = !(state.open[catKey] ?? false);
+  render(state.data);
+});
 
+$("#cats").addEventListener("change", async (event) => {
+  const chk = event.target.closest(".chk");
+  if (!chk) return;
+  await updateTask(chk.dataset.catKey, chk.dataset.taskKey, chk.checked);
+});
 
+$("#cats").addEventListener("blur", (event) => {
+  const note = event.target.closest(".note");
+  if (!note) return;
+  updateNote(note.dataset.catKey, note.dataset.taskKey, note.value);
+}, true);
 
+$("#cats").addEventListener("keydown", (event) => {
+  const note = event.target.closest(".note");
+  if (!note) return;
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter"){
+    note.blur();
+  }
+});
 
+$("#coverageMap").addEventListener("click", (event) => {
+  const btn = event.target.closest(".coverage-item");
+  if (!btn) return;
+  const catKey = btn.dataset.catKey;
+  state.open[catKey] = true;
+  state.highlighted = null;
+  render(state.data);
+  requestAnimationFrame(() => {
+    const el = document.querySelector(`.cat[data-cat-key="${CSS.escape(catKey)}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+});
 
+$("#searchBox").addEventListener("input", (event) => {
+  state.search = event.target.value;
+  render(state.data);
+});
 
+$("#statusFilter").addEventListener("change", (event) => {
+  state.filter = event.target.value;
+  render(state.data);
+});
 
+$("#sortMode").addEventListener("change", (event) => {
+  state.sort = event.target.value;
+  render(state.data);
+});
 
+$("#expandAll").addEventListener("click", () => {
+  AREAS.forEach(area => state.open[keyize(area.title)] = true);
+  render(state.data);
+});
 
+$("#collapseAll").addEventListener("click", () => {
+  AREAS.forEach(area => state.open[keyize(area.title)] = false);
+  render(state.data);
+});
 
+$("#resetDay").addEventListener("click", resetDay);
 
+$("#doAlekSuggestion").addEventListener("click", (event) => {
+  const btn = event.currentTarget;
+  if (!btn.dataset.catKey) return;
+  openAndHighlight(btn.dataset.catKey, btn.dataset.taskKey, "Alek");
+});
 
+$("#doCataSuggestion").addEventListener("click", (event) => {
+  const btn = event.currentTarget;
+  if (!btn.dataset.catKey) return;
+  openAndHighlight(btn.dataset.catKey, btn.dataset.taskKey, "Cata");
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ensureInit().then(startLive).catch((error) => {
+  console.error(error);
+  alert("No se pudo iniciar el radar. Revisa Firebase o la conexión. Porque claramente una checklist también necesita drama técnico.");
+});

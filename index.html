@@ -3,72 +3,166 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Checklist diaria — Musicala</title>
+  <title>Radar Gerencial — Musicala</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- SDKs de Firebase (compatibles con app.js) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
 </head>
 <body>
   <header class="topbar">
-    <h1>✅ Checklist diaria — Musicala</h1>
+    <div class="brand">
+      <img src="logo.png" alt="Logo Musicala" class="logo" />
+      <div>
+        <p class="eyebrow">Musicala Manager</p>
+        <h1>Radar Gerencial</h1>
+      </div>
+    </div>
+
     <div class="bar-right">
-      <span id="today"></span>
+      <span id="today" class="date-pill"></span>
+      <label class="who-wrap" for="who">Estoy marcando como</label>
       <select id="who" title="Quién marca">
         <option value="Alek">Alek</option>
         <option value="Cata">Cata</option>
-        <option value="Ambos">Ambos</option>
       </select>
-      <button id="expandAll" class="ghost">Expandir todo</button>
-      <button id="collapseAll" class="ghost">Contraer todo</button>
-      <button id="resetDay" class="ghost">Reiniciar día</button>
+      <button id="expandAll" class="ghost">Expandir</button>
+      <button id="collapseAll" class="ghost">Contraer</button>
+      <button id="resetDay" class="ghost danger">Nuevo día</button>
     </div>
   </header>
 
   <main class="container">
-    <section class="progress">
+    <section id="oldDayBanner" class="banner hidden"></section>
+
+    <section class="hero-card">
+      <div class="hero-main">
+        <p class="eyebrow">Siguiente jugada sugerida</p>
+        <h2 id="mainHeadline">Cargando radar...</h2>
+        <p id="mainSuggestion">Estamos leyendo las tareas. Qué emoción tan moderna: una lista que mira de vuelta.</p>
+        <div id="smartAlerts" class="chips"></div>
+      </div>
+      <aside class="hero-side">
+        <p class="eyebrow">Último movimiento</p>
+        <div id="lastAction" class="last-action">Sin movimientos todavía.</div>
+      </aside>
+    </section>
+
+    <section id="statsGrid" class="stats-grid"></section>
+
+    <section class="progress-panel">
+      <div class="panel-title-row">
+        <div>
+          <p class="eyebrow">Cobertura del día</p>
+          <h2>Áreas abordadas</h2>
+        </div>
+        <div class="progress-meta">
+          <strong id="areaPct">0%</strong>
+          <span id="areaDetail">0 de 0 áreas</span>
+        </div>
+      </div>
       <div class="progress-line">
-        <div id="progFill" class="progress-fill" style="width:0%"></div>
+        <div id="areaProgFill" class="progress-fill" style="width:0%"></div>
       </div>
-      <div class="progress-meta">
-        <strong id="progPct">0%</strong>
-        <span id="progDetail">0 de 0 tareas</span>
+      <div class="sub-progress">
+        <span id="taskDetail">0 de 0 tareas completadas</span>
+        <span id="balanceDetail">Alek 0 · Cata 0</span>
       </div>
+    </section>
+
+    <section class="suggestion-grid">
+      <article class="mini-panel">
+        <p class="eyebrow">Para Alek</p>
+        <h3 id="alekSuggestionTitle">Cargando...</h3>
+        <p id="alekSuggestionText"></p>
+        <button id="doAlekSuggestion" class="soft-btn">Abrir sugerencia de Alek</button>
+      </article>
+      <article class="mini-panel">
+        <p class="eyebrow">Para Cata</p>
+        <h3 id="cataSuggestionTitle">Cargando...</h3>
+        <p id="cataSuggestionText"></p>
+        <button id="doCataSuggestion" class="soft-btn">Abrir sugerencia de Cata</button>
+      </article>
+      <article class="mini-panel activity-panel">
+        <p class="eyebrow">Actividad reciente</p>
+        <div id="activityFeed" class="activity-feed"></div>
+      </article>
+    </section>
+
+    <section class="controls-card">
+      <div class="controls-grid">
+        <label>
+          Buscar
+          <input id="searchBox" type="search" placeholder="Marketing, finanzas, contrato..." />
+        </label>
+        <label>
+          Ver
+          <select id="statusFilter">
+            <option value="all">Todo</option>
+            <option value="pending">Pendientes</option>
+            <option value="done">Completadas</option>
+            <option value="untouchedAreas">Solo áreas sin tocar</option>
+            <option value="critical">Alta prioridad</option>
+            <option value="alek">Hechas por Alek</option>
+            <option value="cata">Hechas por Cata</option>
+          </select>
+        </label>
+        <label>
+          Orden
+          <select id="sortMode">
+            <option value="radar">Radar gerencial</option>
+            <option value="progressLow">Menor avance primero</option>
+            <option value="alpha">Alfabético</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="coverage-map">
+      <div class="panel-title-row">
+        <div>
+          <p class="eyebrow">Mapa rápido</p>
+          <h2>Frentes de la empresa</h2>
+        </div>
+      </div>
+      <div id="coverageMap" class="coverage-list"></div>
     </section>
 
     <div id="cats" class="cats"></div>
   </main>
 
-  <!-- Template de categoría -->
   <template id="catTmpl">
     <section class="cat">
       <header class="catHead">
         <button class="toggleBtn" aria-label="expandir/contraer">▸</button>
-        <h2 class="catTitle"></h2>
+        <div class="catTitleWrap">
+          <h2 class="catTitle"></h2>
+          <p class="catHint"></p>
+        </div>
         <div class="catProgressWrap">
+          <span class="catStatus"></span>
           <div class="catProgressLine"><div class="catProgressFill"></div></div>
           <small class="catMeta"></small>
         </div>
       </header>
-      <div class="tasks" hidden></div>
+      <div class="tasks"></div>
     </section>
   </template>
 
-  <!-- Template de tarea -->
   <template id="taskTmpl">
     <div class="task">
       <label class="row">
         <input type="checkbox" class="chk" />
         <span class="taskName"></span>
       </label>
-      <div class="metaRow">
+      <div class="task-tools">
+        <span class="priority-pill"></span>
         <small class="by">—</small>
         <small class="time"></small>
       </div>
+      <textarea class="note" rows="2" placeholder="Nota rápida: qué pasó, qué falta o qué revisar..."></textarea>
     </div>
   </template>
 
-  <!-- Tu script principal -->
   <script src="app.js"></script>
 </body>
 </html>
