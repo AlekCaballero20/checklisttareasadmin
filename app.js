@@ -320,7 +320,8 @@ function createTask(areaTitle, label, previous = {}){
     time: previous.time || previous.updatedAt || null,
     updatedAt: previous.updatedAt || previous.time || null,
     notes: previous.notes || "",
-    priority: previous.priority || defaultPriority(areaTitle, label)
+    priority: previous.priority || defaultPriority(areaTitle, label),
+    custom: Boolean(previous.custom)
   };
 }
 
@@ -340,6 +341,12 @@ function createFreshCategories(previousCategories = {}){
       const taskKey = keyize(taskLabel);
       const previousTask = previousCat.tasks?.[taskKey] || {};
       categories[catKey].tasks[taskKey] = createTask(area.title, taskLabel, previousTask);
+    });
+    // Conservar tareas personalizadas agregadas desde el front.
+    Object.entries(previousCat.tasks || {}).forEach(([taskKey, prevTask]) => {
+      if (categories[catKey].tasks[taskKey]) return;
+      if (!prevTask || !prevTask.label) return;
+      categories[catKey].tasks[taskKey] = createTask(area.title, prevTask.label, { ...prevTask, custom: true });
     });
   });
   return categories;
@@ -382,10 +389,11 @@ async function ensureInit(){
 
   const current = snap.val() || {};
   const patchedCategories = createFreshCategories(current.categories || {});
+  // Modo continuo: el avance se conserva entre días; solo se actualiza la fecha visible.
   await db.ref(ROOT_PATH).update({
     categories: patchedCategories,
     updatedAt: current.updatedAt || Date.now(),
-    dateLabel: current.dateLabel || today
+    dateLabel: today
   });
 }
 
@@ -399,14 +407,27 @@ function startLive(){
   });
 }
 
+// Tareas de un área: las fijas de AREAS + las personalizadas guardadas en Firebase.
+function areaTaskEntries(area, catInfo = {}){
+  const entries = area.tasks.map((taskLabel) => {
+    const taskKey = keyize(taskLabel);
+    return { taskKey, task: catInfo.tasks?.[taskKey] || createTask(area.title, taskLabel) };
+  });
+  const defaultKeys = new Set(entries.map(e => e.taskKey));
+  Object.entries(catInfo.tasks || {}).forEach(([taskKey, task]) => {
+    if (defaultKeys.has(taskKey) || !task?.label) return;
+    entries.push({ taskKey, task });
+  });
+  return entries;
+}
+
 function flattenTasks(categories = {}){
   const flat = [];
   AREAS.forEach((area) => {
     const catKey = keyize(area.title);
     const catInfo = categories[catKey] || {};
-    area.tasks.forEach((taskLabel) => {
-      const taskKey = keyize(taskLabel);
-      const task = catInfo.tasks?.[taskKey] || createTask(area.title, taskLabel);
+    areaTaskEntries(area, catInfo).forEach(({ taskKey, task }) => {
+      const taskLabel = task.label;
       flat.push({
         catKey,
         taskKey,
@@ -420,7 +441,8 @@ function flattenTasks(categories = {}){
         time: task.time || null,
         updatedAt: task.updatedAt || task.time || null,
         notes: task.notes || "",
-        priority: task.priority || defaultPriority(area.title, taskLabel)
+        priority: task.priority || defaultPriority(area.title, taskLabel),
+        custom: Boolean(task.custom)
       });
     });
   });
@@ -430,10 +452,7 @@ function flattenTasks(categories = {}){
 function areaStats(categories = {}){
   return AREAS.map((area) => {
     const catKey = keyize(area.title);
-    const tasks = area.tasks.map((label) => {
-      const taskKey = keyize(label);
-      return categories[catKey]?.tasks?.[taskKey] || createTask(area.title, label);
-    });
+    const tasks = areaTaskEntries(area, categories[catKey] || {}).map(e => e.task);
     const total = tasks.length;
     const done = tasks.filter((task) => task.done).length;
     const pct = total ? Math.round(done / total * 100) : 0;
@@ -515,9 +534,6 @@ function pickNextTaskFor(person, metrics, avoidCatKey = null){
 
 function buildAlerts(metrics, data){
   const alerts = [];
-  if (data.dateLabel && data.dateLabel !== getTodayColombia()){
-    alerts.push({ type: "warn", text: `El tablero todavía está en ${data.dateLabel}. Conviene abrir nuevo día.` });
-  }
   if (metrics.emptyAreas.length){
     alerts.push({ type: "warn", text: `${metrics.emptyAreas.length} áreas sin tocar` });
   } else {
@@ -556,11 +572,12 @@ function render(data){
 }
 
 function renderOldDayBanner(data){
+  // Modo continuo: el radar retoma donde quedó. Solo avisamos (suave) si la fecha guardada quedó vieja.
   const banner = $("#oldDayBanner");
   const today = getTodayColombia();
   if (data.dateLabel && data.dateLabel !== today){
     banner.classList.remove("hidden");
-    banner.textContent = `Este radar pertenece al ${data.dateLabel}. Hoy es ${today}. Dale “Nuevo día” para archivar y empezar limpio.`;
+    banner.textContent = `Retomando el avance que quedó del ${data.dateLabel}. Nada se reinicia solo; si quieren empezar en blanco, usen “Reiniciar ciclo”.`;
   } else {
     banner.classList.add("hidden");
     banner.textContent = "";
@@ -735,9 +752,8 @@ function renderCategories(categories, metrics){
     toggle.textContent = isOpen ? "▾" : "▸";
 
     let added = 0;
-    area.tasks.forEach((taskLabel) => {
-      const taskKey = keyize(taskLabel);
-      const rawTask = catInfo.tasks?.[taskKey] || createTask(area.title, taskLabel);
+    areaTaskEntries(area, catInfo).forEach(({ taskKey, task: rawTask }) => {
+      const taskLabel = rawTask.label;
       const info = {
         catKey: area.catKey,
         taskKey,
@@ -747,7 +763,8 @@ function renderCategories(categories, metrics){
         by: rawTask.by || null,
         time: rawTask.time || null,
         notes: rawTask.notes || "",
-        priority: rawTask.priority || defaultPriority(area.title, taskLabel)
+        priority: rawTask.priority || defaultPriority(area.title, taskLabel),
+        custom: Boolean(rawTask.custom)
       };
 
       if (!passesFilter(info, area, filter, search)) return;
@@ -761,6 +778,7 @@ function renderCategories(categories, metrics){
       const timeEl = tNode.querySelector(".time");
       const note = tNode.querySelector(".note");
       const priority = tNode.querySelector(".priority-pill");
+      const delBtn = tNode.querySelector(".deleteTask");
 
       taskDiv.dataset.catKey = area.catKey;
       taskDiv.dataset.taskKey = taskKey;
@@ -777,6 +795,11 @@ function renderCategories(categories, metrics){
       note.dataset.taskKey = taskKey;
       priority.textContent = `Prioridad ${info.priority}`;
       priority.className = `priority-pill ${info.priority}`;
+      if (info.custom){
+        delBtn.classList.remove("hidden");
+        delBtn.dataset.catKey = area.catKey;
+        delBtn.dataset.taskKey = taskKey;
+      }
 
       tasksEl.appendChild(tNode);
     });
@@ -829,9 +852,31 @@ async function updateNote(catKey, taskKey, notes){
   await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
 }
 
+async function addTask(catKey, label){
+  const cleanLabel = label.trim();
+  if (!cleanLabel) return;
+  const area = AREAS.find(a => keyize(a.title) === catKey);
+  let taskKey = keyize(cleanLabel);
+  const existing = state.data?.categories?.[catKey]?.tasks || {};
+  if (existing[taskKey]) taskKey = `${taskKey}_${Date.now()}`;
+  const task = createTask(area?.title || "", cleanLabel, { custom: true });
+  await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).set(task);
+  await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+  state.open[catKey] = true;
+}
+
+async function deleteTask(catKey, taskKey){
+  const task = state.data?.categories?.[catKey]?.tasks?.[taskKey];
+  if (!task?.custom) return;
+  const ok = confirm(`¿Eliminar la tarea “${task.label}”?`);
+  if (!ok) return;
+  await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).remove();
+  await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+}
+
 async function resetDay(){
   if (!state.data) return;
-  const ok = confirm("¿Archivar el radar actual y empezar un nuevo día en blanco?");
+  const ok = confirm("¿Archivar todo el avance actual al historial y reiniciar el radar en blanco? El progreso normalmente se conserva entre días: solo haz esto si de verdad quieren empezar un ciclo nuevo.");
   if (!ok) return;
   const today = getTodayColombia();
   const archiveKey = `${state.data.dateLabel || today}_${Date.now()}`;
@@ -842,9 +887,18 @@ async function resetDay(){
   });
   state.open = {};
   state.highlighted = null;
+  // El reinicio limpia el progreso pero conserva las tareas personalizadas creadas desde el front.
+  const blank = createBlankCategories();
+  Object.entries(state.data.categories || {}).forEach(([catKey, cat]) => {
+    Object.entries(cat?.tasks || {}).forEach(([taskKey, task]) => {
+      if (task?.custom && blank[catKey] && !blank[catKey].tasks[taskKey]){
+        blank[catKey].tasks[taskKey] = createTask(cat.title || "", task.label, { custom: true, priority: task.priority });
+      }
+    });
+  });
   await db.ref(ROOT_PATH).set({
     dateLabel: today,
-    categories: createBlankCategories(),
+    categories: blank,
     updatedAt: Date.now(),
     allAreasCoveredAt: null,
     createdAt: Date.now()
@@ -860,6 +914,87 @@ async function maybeStampAllAreasCovered(data){
   }
 }
 
+// ---- Historial ----
+
+function summarizeHistoryEntry(entry){
+  const metrics = getMetrics(entry || {});
+  const doneTasks = metrics.flat
+    .filter(t => t.done)
+    .sort((a,b) => (b.time || 0) - (a.time || 0));
+  return { metrics, doneTasks };
+}
+
+function renderHistoryEntry(key, entry){
+  const { metrics, doneTasks } = summarizeHistoryEntry(entry);
+  const areaPct = AREAS.length ? Math.round(metrics.coveredAreas / AREAS.length * 100) : 0;
+  const taskPct = metrics.total ? Math.round(metrics.done / metrics.total * 100) : 0;
+
+  const tasksHTML = doneTasks.length
+    ? doneTasks.map(task => `
+        <div class="history-task">
+          <strong>${escapeHTML(task.emoji)} ${escapeHTML(task.catTitle)}</strong>
+          <span>${escapeHTML(task.label)}</span>
+          <small>${escapeHTML(task.by || "—")}${task.time ? ` · ${escapeHTML(formatDateTime(task.time))}` : ""}</small>
+          ${task.notes?.trim() ? `<p class="history-note">📝 ${escapeHTML(task.notes)}</p>` : ""}
+        </div>
+      `).join("")
+    : `<div class="history-task"><span>Este ciclo se archivó sin tareas completadas.</span></div>`;
+
+  return `
+    <article class="history-entry collapsed" data-history-key="${escapeHTML(key)}">
+      <header class="history-head">
+        <button class="toggleBtn historyToggle" aria-label="expandir/contraer">▸</button>
+        <div class="history-title">
+          <strong>${escapeHTML(entry.dateLabel || "Sin fecha")}</strong>
+          <small>Archivado: ${escapeHTML(formatDateTime(entry.archivedAt))}</small>
+        </div>
+        <div class="history-meta">
+          <span class="chip info">${metrics.done}/${metrics.total} tareas (${taskPct}%)</span>
+          <span class="chip ${metrics.coveredAreas === AREAS.length ? "ok" : "warn"}">${metrics.coveredAreas}/${AREAS.length} áreas (${areaPct}%)</span>
+          <span class="chip info">Alek ${metrics.byPerson.Alek} · Cata ${metrics.byPerson.Cata}</span>
+        </div>
+      </header>
+      <div class="history-tasks">${tasksHTML}</div>
+    </article>
+  `;
+}
+
+async function loadHistory(){
+  const list = $("#historyList");
+  list.innerHTML = "Cargando historial...";
+  try {
+    const snap = await db.ref(HISTORY_PATH).get();
+    if (!snap.exists()){
+      list.innerHTML = `<div class="history-empty">Todavía no hay ciclos archivados. Cuando usen “Reiniciar ciclo”, el avance quedará guardado aquí.</div>`;
+      return;
+    }
+    const entries = Object.entries(snap.val() || {})
+      .sort((a,b) => (b[1]?.archivedAt || 0) - (a[1]?.archivedAt || 0));
+    list.innerHTML = entries.map(([key, entry]) => renderHistoryEntry(key, entry || {})).join("");
+  } catch (error){
+    console.error(error);
+    list.innerHTML = `<div class="history-empty">No se pudo cargar el historial. Revisa la conexión e intenta de nuevo.</div>`;
+  }
+}
+
+function setHistoryOpen(open){
+  document.body.classList.toggle("history-open", open);
+  $("#historyView").classList.toggle("hidden", !open);
+  if (open) loadHistory();
+}
+
+$("#historyBtn").addEventListener("click", () => setHistoryOpen(true));
+$("#closeHistory").addEventListener("click", () => setHistoryOpen(false));
+
+$("#historyList").addEventListener("click", (event) => {
+  const head = event.target.closest(".history-head");
+  if (!head) return;
+  const entry = head.closest(".history-entry");
+  entry.classList.toggle("collapsed");
+  const toggle = entry.querySelector(".historyToggle");
+  if (toggle) toggle.textContent = entry.classList.contains("collapsed") ? "▸" : "▾";
+});
+
 function openAndHighlight(catKey, taskKey, person = null){
   state.open[catKey] = true;
   state.highlighted = { catKey, taskKey };
@@ -871,7 +1006,24 @@ function openAndHighlight(catKey, taskKey, person = null){
   });
 }
 
-$("#cats").addEventListener("click", (event) => {
+$("#cats").addEventListener("click", async (event) => {
+  const delBtn = event.target.closest(".deleteTask");
+  if (delBtn){
+    await deleteTask(delBtn.dataset.catKey, delBtn.dataset.taskKey);
+    return;
+  }
+
+  const addBtn = event.target.closest(".addTaskBtn");
+  if (addBtn){
+    const section = addBtn.closest(".cat");
+    const input = section?.querySelector(".addTaskInput");
+    if (section?.dataset.catKey && input?.value.trim()){
+      await addTask(section.dataset.catKey, input.value);
+      input.value = "";
+    }
+    return;
+  }
+
   const toggle = event.target.closest(".toggleBtn");
   if (!toggle) return;
   const section = toggle.closest(".cat");
@@ -893,7 +1045,18 @@ $("#cats").addEventListener("blur", (event) => {
   updateNote(note.dataset.catKey, note.dataset.taskKey, note.value);
 }, true);
 
-$("#cats").addEventListener("keydown", (event) => {
+$("#cats").addEventListener("keydown", async (event) => {
+  const addInput = event.target.closest(".addTaskInput");
+  if (addInput && event.key === "Enter"){
+    event.preventDefault();
+    const section = addInput.closest(".cat");
+    if (section?.dataset.catKey && addInput.value.trim()){
+      await addTask(section.dataset.catKey, addInput.value);
+      addInput.value = "";
+    }
+    return;
+  }
+
   const note = event.target.closest(".note");
   if (!note) return;
   if ((event.ctrlKey || event.metaKey) && event.key === "Enter"){

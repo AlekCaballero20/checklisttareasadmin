@@ -202,6 +202,100 @@ button{cursor:pointer}
 .priority-pill.alta{background:#fff7ed; color:#c2410c}
 .priority-pill.media{background:#eff6ff; color:#1d4ed8}
 .priority-pill.baja{background:#f3f4f6; color:#475569}
+.deleteTask{
+  margin-left:auto;
+  border:1px solid var(--ring);
+  background:#fff;
+  color:var(--rojo);
+  border-radius:10px;
+  padding:3px 8px;
+  cursor:pointer;
+  font-size:.8rem;
+}
+.deleteTask:hover{background:#fff7ed; border-color:#fed7aa}
+.addTaskRow{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px dashed var(--ring);
+}
+.addTaskRow .addTaskInput{
+  flex:1;
+  border:1px solid var(--ring);
+  border-radius:12px;
+  padding:9px 10px;
+  background:#fafafa;
+  font:inherit;
+}
+.addTaskRow .addTaskBtn{
+  border:1px solid var(--azul);
+  background:#fff;
+  color:var(--azul);
+  border-radius:12px;
+  padding:9px 14px;
+  font-weight:800;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.addTaskRow .addTaskBtn:hover{background:var(--soft)}
+.cat.collapsed .addTaskRow{display:none}
+
+/* ---- Historial ---- */
+body.history-open .container > section:not(#historyView):not(#oldDayBanner),
+body.history-open #cats{display:none}
+.history-view{
+  background:var(--card);
+  border:1px solid var(--ring);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:var(--shadow);
+  margin-bottom:14px;
+}
+.history-list{display:grid; gap:10px; margin-top:12px}
+.history-empty{color:var(--muted); font-weight:700; padding:14px}
+.history-entry{
+  border:1px solid var(--ring);
+  border-radius:14px;
+  background:#fff;
+  overflow:hidden;
+}
+.history-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  cursor:pointer;
+  flex-wrap:wrap;
+}
+.history-head:hover{background:var(--soft)}
+.history-title{display:flex; flex-direction:column}
+.history-title small{color:var(--muted)}
+.history-meta{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+.history-tasks{
+  display:grid;
+  gap:8px;
+  padding:10px 12px 14px;
+  border-top:1px dashed var(--ring);
+}
+.history-entry.collapsed .history-tasks{display:none}
+.history-task{
+  border:1px solid var(--ring);
+  border-radius:12px;
+  padding:8px 10px;
+  background:#fafafa;
+  display:grid;
+  gap:2px;
+}
+.history-task small{color:var(--muted)}
+.history-note{
+  margin:4px 0 0;
+  font-size:.85rem;
+  color:#374151;
+  background:#fffbeb;
+  border-radius:8px;
+  padding:6px 8px;
+}
 .note{
   width:calc(100% - 30px);
   margin:9px 0 0 30px;
