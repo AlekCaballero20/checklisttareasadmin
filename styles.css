@@ -202,16 +202,24 @@ button{cursor:pointer}
 .priority-pill.alta{background:#fff7ed; color:#c2410c}
 .priority-pill.media{background:#eff6ff; color:#1d4ed8}
 .priority-pill.baja{background:#f3f4f6; color:#475569}
-.deleteTask{
+.editTask, .deleteTask{
   margin-left:auto;
   border:1px solid var(--ring);
   background:#fff;
-  color:var(--rojo);
   border-radius:10px;
   padding:3px 8px;
   cursor:pointer;
   font-size:.8rem;
+  font-weight:800;
 }
+.editTask{
+  color:var(--azul);
+}
+.deleteTask{
+  margin-left:0;
+  color:var(--rojo);
+}
+.editTask:hover{background:var(--soft); border-color:#dbe4ff}
 .deleteTask:hover{background:#fff7ed; border-color:#fed7aa}
 .addTaskRow{
   display:flex;

@@ -321,7 +321,8 @@ function createTask(areaTitle, label, previous = {}){
     updatedAt: previous.updatedAt || previous.time || null,
     notes: previous.notes || "",
     priority: previous.priority || defaultPriority(areaTitle, label),
-    custom: Boolean(previous.custom)
+    custom: Boolean(previous.custom),
+    deleted: Boolean(previous.deleted)
   };
 }
 
@@ -340,7 +341,7 @@ function createFreshCategories(previousCategories = {}){
     area.tasks.forEach((taskLabel) => {
       const taskKey = keyize(taskLabel);
       const previousTask = previousCat.tasks?.[taskKey] || {};
-      categories[catKey].tasks[taskKey] = createTask(area.title, taskLabel, previousTask);
+      categories[catKey].tasks[taskKey] = createTask(area.title, previousTask.label || taskLabel, previousTask);
     });
     // Conservar tareas personalizadas agregadas desde el front.
     Object.entries(previousCat.tasks || {}).forEach(([taskKey, prevTask]) => {
@@ -412,10 +413,10 @@ function areaTaskEntries(area, catInfo = {}){
   const entries = area.tasks.map((taskLabel) => {
     const taskKey = keyize(taskLabel);
     return { taskKey, task: catInfo.tasks?.[taskKey] || createTask(area.title, taskLabel) };
-  });
+  }).filter(({ task }) => !task?.deleted);
   const defaultKeys = new Set(entries.map(e => e.taskKey));
   Object.entries(catInfo.tasks || {}).forEach(([taskKey, task]) => {
-    if (defaultKeys.has(taskKey) || !task?.label) return;
+    if (defaultKeys.has(taskKey) || !task?.label || task.deleted) return;
     entries.push({ taskKey, task });
   });
   return entries;
@@ -764,7 +765,8 @@ function renderCategories(categories, metrics){
         time: rawTask.time || null,
         notes: rawTask.notes || "",
         priority: rawTask.priority || defaultPriority(area.title, taskLabel),
-        custom: Boolean(rawTask.custom)
+        custom: Boolean(rawTask.custom),
+        deleted: Boolean(rawTask.deleted)
       };
 
       if (!passesFilter(info, area, filter, search)) return;
@@ -778,6 +780,7 @@ function renderCategories(categories, metrics){
       const timeEl = tNode.querySelector(".time");
       const note = tNode.querySelector(".note");
       const priority = tNode.querySelector(".priority-pill");
+      const editBtn = tNode.querySelector(".editTask");
       const delBtn = tNode.querySelector(".deleteTask");
 
       taskDiv.dataset.catKey = area.catKey;
@@ -795,11 +798,10 @@ function renderCategories(categories, metrics){
       note.dataset.taskKey = taskKey;
       priority.textContent = `Prioridad ${info.priority}`;
       priority.className = `priority-pill ${info.priority}`;
-      if (info.custom){
-        delBtn.classList.remove("hidden");
-        delBtn.dataset.catKey = area.catKey;
-        delBtn.dataset.taskKey = taskKey;
-      }
+      editBtn.dataset.catKey = area.catKey;
+      editBtn.dataset.taskKey = taskKey;
+      delBtn.dataset.catKey = area.catKey;
+      delBtn.dataset.taskKey = taskKey;
 
       tasksEl.appendChild(tNode);
     });
@@ -865,12 +867,39 @@ async function addTask(catKey, label){
   state.open[catKey] = true;
 }
 
+async function editTask(catKey, taskKey){
+  const task = state.data?.categories?.[catKey]?.tasks?.[taskKey];
+  if (!task) return;
+  const nextLabel = prompt("Nuevo nombre de la tarea:", task.label || "");
+  if (nextLabel === null) return;
+  const cleanLabel = nextLabel.trim();
+  if (!cleanLabel || cleanLabel === task.label) return;
+  const area = AREAS.find(a => keyize(a.title) === catKey);
+  await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).update({
+    label: cleanLabel,
+    priority: task.priority || defaultPriority(area?.title || "", cleanLabel),
+    updatedAt: Date.now()
+  });
+  await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+}
+
 async function deleteTask(catKey, taskKey){
   const task = state.data?.categories?.[catKey]?.tasks?.[taskKey];
-  if (!task?.custom) return;
+  if (!task) return;
   const ok = confirm(`¿Eliminar la tarea “${task.label}”?`);
   if (!ok) return;
-  await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).remove();
+  const ref = db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`);
+  if (task.custom){
+    await ref.remove();
+  } else {
+    await ref.update({
+      deleted: true,
+      done: false,
+      by: null,
+      time: null,
+      updatedAt: Date.now()
+    });
+  }
   await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
 }
 
@@ -891,6 +920,13 @@ async function resetDay(){
   const blank = createBlankCategories();
   Object.entries(state.data.categories || {}).forEach(([catKey, cat]) => {
     Object.entries(cat?.tasks || {}).forEach(([taskKey, task]) => {
+      if (blank[catKey]?.tasks?.[taskKey] && (task?.deleted || task?.label)){
+        blank[catKey].tasks[taskKey] = createTask(cat.title || "", task.label || blank[catKey].tasks[taskKey].label, {
+          custom: false,
+          deleted: Boolean(task.deleted),
+          priority: task.priority
+        });
+      }
       if (task?.custom && blank[catKey] && !blank[catKey].tasks[taskKey]){
         blank[catKey].tasks[taskKey] = createTask(cat.title || "", task.label, { custom: true, priority: task.priority });
       }
@@ -1007,6 +1043,12 @@ function openAndHighlight(catKey, taskKey, person = null){
 }
 
 $("#cats").addEventListener("click", async (event) => {
+  const editBtn = event.target.closest(".editTask");
+  if (editBtn){
+    await editTask(editBtn.dataset.catKey, editBtn.dataset.taskKey);
+    return;
+  }
+
   const delBtn = event.target.closest(".deleteTask");
   if (delBtn){
     await deleteTask(delBtn.dataset.catKey, delBtn.dataset.taskKey);
