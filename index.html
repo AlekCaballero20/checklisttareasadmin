@@ -6,9 +6,22 @@
   <title>Radar Gerencial — Musicala</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
 </head>
-<body>
+<body class="auth-pending">
+  <section id="loginView" class="login-view" aria-live="polite">
+    <div class="login-card">
+      <img src="logo.png" alt="Logo Musicala" class="login-logo" />
+      <p class="eyebrow">Musicala Manager</p>
+      <h1>Radar Gerencial</h1>
+      <p>Ingresa con tu correo autorizado para que cada movimiento quede identificado.</p>
+      <button id="googleLogin" class="google-login">Continuar con Google</button>
+      <p id="loginMessage" class="login-message">Solo pueden acceder Alek y Cata.</p>
+    </div>
+  </section>
+  <div id="appShell" class="hidden">
   <header class="topbar">
     <div class="brand">
       <img src="logo.png" alt="Logo Musicala" class="logo" />
@@ -20,15 +33,12 @@
 
     <div class="bar-right">
       <span id="today" class="date-pill"></span>
-      <label class="who-wrap" for="who">Estoy marcando como</label>
-      <select id="who" title="Quién marca">
-        <option value="Alek">Alek</option>
-        <option value="Cata">Cata</option>
-      </select>
+      <span id="signedInUser" class="signed-in-user"></span>
       <button id="historyBtn" class="ghost">Historial</button>
       <button id="expandAll" class="ghost">Expandir</button>
       <button id="collapseAll" class="ghost">Contraer</button>
       <button id="resetDay" class="ghost danger" title="Archiva el avance al historial y empieza en blanco">Reiniciar ciclo</button>
+      <button id="logoutBtn" class="ghost">Salir</button>
     </div>
   </header>
 
@@ -180,6 +190,7 @@
       <textarea class="note" rows="2" placeholder="Nota rápida: qué pasó, qué falta o qué revisar..."></textarea>
     </div>
   </template>
+  </div>
 
   <script src="app.js"></script>
 </body>

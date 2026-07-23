@@ -48,21 +48,30 @@ button{cursor:pointer}
 .eyebrow{margin:0 0 4px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:.68rem; font-weight:900}
 .topbar .eyebrow{color:rgba(255,255,255,.78)}
 .bar-right{display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap}
-.who-wrap{font-size:.74rem; opacity:.86}
-.date-pill, .topbar select, .topbar button{
+.date-pill, .signed-in-user, .topbar button{
   border:0;
   border-radius:999px;
   padding:8px 11px;
   font-weight:800;
 }
 .date-pill{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.24)}
-.topbar select{color:#111; background:#fff}
+.signed-in-user{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.24); font-size:.82rem}
 .topbar .ghost{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.62)}
 .topbar .ghost:hover{background:rgba(255,255,255,.12)}
 .topbar .danger{border-color:rgba(255,255,255,.35)}
 
 .container{max-width:1180px; margin:18px auto 34px; padding:0 14px}
 .hidden{display:none!important}
+.login-view{min-height:100vh; display:grid; place-items:center; padding:24px}
+.login-card{width:min(100%,430px); padding:34px; text-align:center; background:rgba(255,255,255,.96); border:1px solid var(--ring); border-radius:26px; box-shadow:var(--shadow)}
+.login-logo{width:72px; height:72px; object-fit:contain; padding:8px; border-radius:20px; background:#fff; box-shadow:0 6px 18px rgba(31,59,131,.12)}
+.login-card h1{margin:10px 0 8px; color:var(--azul)}
+.login-card > p:not(.eyebrow):not(.login-message){margin:0 0 22px; color:#4b5563; line-height:1.5}
+.google-login{width:100%; border:0; border-radius:14px; padding:13px 16px; color:#fff; font-weight:900; background:linear-gradient(90deg,var(--azul),var(--violeta)); box-shadow:0 8px 18px rgba(31,59,131,.2)}
+.google-login:hover{filter:brightness(1.06)}
+.google-login:disabled{cursor:wait; opacity:.72}
+.login-message{min-height:1.4em; margin:14px 0 0; color:var(--muted); font-size:.88rem}
+.login-message.error{color:#b42318; font-weight:700}
 .banner{
   background:#fff7ed;
   color:#7c2d12;

@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthorizedManager() {
+      return request.auth != null &&
+        (request.auth.token.email == 'alekcaballeromusic@gmail.com' ||
+         request.auth.token.email == 'catalina.medina.leal@gmail.com');
+    }
+
+    match /checklistGerencialAudit/{eventId} {
+      allow read, write: if isAuthorizedManager();
+    }
+  }
+}

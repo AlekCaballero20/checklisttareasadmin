@@ -13,11 +13,18 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const firestore = firebase.firestore();
 const db = firebase.database();
 
 const PEOPLE = ["Alek", "Cata"];
+const ALLOWED_USERS = Object.freeze({
+  "alekcaballeromusic@gmail.com": "Alek",
+  "catalina.medina.leal@gmail.com": "Cata"
+});
 const ROOT_PATH = "checklistCurrentV3_radarGerencial";
 const HISTORY_PATH = "checklistHistoryV3_radarGerencial";
+const AUDIT_COLLECTION = "checklistGerencialAudit";
 
 const AREAS = [
   {
@@ -252,8 +259,48 @@ const state = {
   filter: "all",
   sort: "radar",
   highlighted: null,
-  lastSavedNotes: {}
+  lastSavedNotes: {},
+  user: null,
+  started: false
 };
+
+function getActor(){
+  if (!state.user) throw new Error("Debes iniciar sesión para modificar el radar.");
+  return { name: state.user.name, email: state.user.email };
+}
+
+async function logAudit(action, details = {}){
+  const actor = getActor();
+  try {
+    await firestore.collection(AUDIT_COLLECTION).add({
+      action,
+      actorName: actor.name,
+      actorEmail: actor.email,
+      occurredAt: firebase.firestore.FieldValue.serverTimestamp(),
+      clientOccurredAt: Date.now(),
+      ...details
+    });
+  } catch (error){
+    // El tablero sigue funcionando si el historial tiene una incidencia temporal.
+    console.error("No se pudo guardar la auditoría en Firestore.", error);
+  }
+}
+
+function showLogin(message = "Solo pueden acceder Alek y Cata.", isError = false){
+  document.body.classList.remove("auth-pending");
+  $("#appShell").classList.add("hidden");
+  $("#loginView").classList.remove("hidden");
+  const messageEl = $("#loginMessage");
+  messageEl.textContent = message;
+  messageEl.classList.toggle("error", isError);
+}
+
+function showApp(user){
+  document.body.classList.remove("auth-pending");
+  $("#loginView").classList.add("hidden");
+  $("#appShell").classList.remove("hidden");
+  $("#signedInUser").textContent = `${user.name} · ${user.email}`;
+}
 
 function escapeHTML(value = ""){
   return String(value).replace(/[&<>'"]/g, (char) => ({
@@ -322,7 +369,11 @@ function createTask(areaTitle, label, previous = {}){
     notes: previous.notes || "",
     priority: previous.priority || defaultPriority(areaTitle, label),
     custom: Boolean(previous.custom),
-    deleted: Boolean(previous.deleted)
+    deleted: Boolean(previous.deleted),
+    createdBy: previous.createdBy || null,
+    createdByEmail: previous.createdByEmail || null,
+    updatedBy: previous.updatedBy || null,
+    updatedByEmail: previous.updatedByEmail || null
   };
 }
 
@@ -373,6 +424,7 @@ function createBlankCategories(){
 }
 
 async function ensureInit(){
+  const actor = getActor();
   const today = getTodayColombia();
   $("#today").textContent = today;
 
@@ -383,7 +435,9 @@ async function ensureInit(){
       categories: createBlankCategories(),
       updatedAt: Date.now(),
       allAreasCoveredAt: null,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      createdBy: actor.name,
+      createdByEmail: actor.email
     });
     return;
   }
@@ -394,7 +448,9 @@ async function ensureInit(){
   await db.ref(ROOT_PATH).update({
     categories: patchedCategories,
     updatedAt: current.updatedAt || Date.now(),
-    dateLabel: today
+    dateLabel: today,
+    updatedBy: actor.name,
+    updatedByEmail: actor.email
   });
 }
 
@@ -439,6 +495,7 @@ function flattenTasks(categories = {}){
         label: task.label || taskLabel,
         done: Boolean(task.done),
         by: task.by || null,
+        byEmail: task.byEmail || null,
         time: task.time || null,
         updatedAt: task.updatedAt || task.time || null,
         notes: task.notes || "",
@@ -592,7 +649,7 @@ function renderHero(metrics, latest, suggestion, data){
 
   if (!latest){
     headline.textContent = "Arranquen por el radar principal";
-    const first = pickNextTaskFor($("#who").value, metrics);
+    const first = pickNextTaskFor(getActor().name, metrics);
     suggestionText.textContent = first
       ? `${first.person} podría empezar por ${first.area.emoji} ${first.area.title}: “${first.task.label}”. Así el día no empieza con la elegante estrategia de improvisar.`
       : "Todo está cubierto. Sospechoso, pero agradable.";
@@ -762,6 +819,7 @@ function renderCategories(categories, metrics){
         label: rawTask.label || taskLabel,
         done: Boolean(rawTask.done),
         by: rawTask.by || null,
+        byEmail: rawTask.byEmail || null,
         time: rawTask.time || null,
         notes: rawTask.notes || "",
         priority: rawTask.priority || defaultPriority(area.title, taskLabel),
@@ -791,7 +849,7 @@ function renderCategories(categories, metrics){
       chk.dataset.catKey = area.catKey;
       chk.dataset.taskKey = taskKey;
       name.textContent = info.label;
-      byEl.textContent = info.by ? `Hecho por: ${info.by}` : "Pendiente";
+      byEl.textContent = info.by ? `Hecho por: ${info.by}${info.byEmail ? ` (${info.byEmail})` : ""}` : "Pendiente";
       timeEl.textContent = info.time ? formatDateTime(info.time) : "";
       note.value = info.notes || "";
       note.dataset.catKey = area.catKey;
@@ -831,43 +889,61 @@ function passesFilter(task, area, filter, search){
 }
 
 async function updateTask(catKey, taskKey, done){
-  const who = $("#who").value;
+  const actor = getActor();
   const payload = {
     done,
-    by: done ? who : null,
+    by: done ? actor.name : null,
+    byEmail: done ? actor.email : null,
     time: done ? Date.now() : null,
+    updatedBy: actor.name,
+    updatedByEmail: actor.email,
     updatedAt: Date.now()
   };
   await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).update(payload);
   await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+  await logAudit(done ? "task_completed" : "task_reopened", { catKey, taskKey });
 }
 
 async function updateNote(catKey, taskKey, notes){
+  const actor = getActor();
   const cleanNotes = notes.trim();
   const noteKey = `${catKey}/${taskKey}`;
   if (state.lastSavedNotes[noteKey] === cleanNotes) return;
   state.lastSavedNotes[noteKey] = cleanNotes;
   await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).update({
     notes: cleanNotes,
+    updatedBy: actor.name,
+    updatedByEmail: actor.email,
     updatedAt: Date.now()
   });
   await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+  await logAudit("task_note_updated", { catKey, taskKey, hasNote: Boolean(cleanNotes) });
 }
 
 async function addTask(catKey, label){
+  const actor = getActor();
   const cleanLabel = label.trim();
   if (!cleanLabel) return;
   const area = AREAS.find(a => keyize(a.title) === catKey);
   let taskKey = keyize(cleanLabel);
   const existing = state.data?.categories?.[catKey]?.tasks || {};
   if (existing[taskKey]) taskKey = `${taskKey}_${Date.now()}`;
-  const task = createTask(area?.title || "", cleanLabel, { custom: true });
+  const task = createTask(area?.title || "", cleanLabel, {
+    custom: true,
+    createdBy: actor.name,
+    createdByEmail: actor.email,
+    updatedBy: actor.name,
+    updatedByEmail: actor.email,
+    updatedAt: Date.now()
+  });
   await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).set(task);
   await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+  await logAudit("task_created", { catKey, taskKey, label: cleanLabel });
   state.open[catKey] = true;
 }
 
 async function editTask(catKey, taskKey){
+  const actor = getActor();
   const task = state.data?.categories?.[catKey]?.tasks?.[taskKey];
   if (!task) return;
   const nextLabel = prompt("Nuevo nombre de la tarea:", task.label || "");
@@ -878,12 +954,16 @@ async function editTask(catKey, taskKey){
   await db.ref(`${ROOT_PATH}/categories/${catKey}/tasks/${taskKey}`).update({
     label: cleanLabel,
     priority: task.priority || defaultPriority(area?.title || "", cleanLabel),
+    updatedBy: actor.name,
+    updatedByEmail: actor.email,
     updatedAt: Date.now()
   });
   await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+  await logAudit("task_renamed", { catKey, taskKey, previousLabel: task.label || "", label: cleanLabel });
 }
 
 async function deleteTask(catKey, taskKey){
+  const actor = getActor();
   const task = state.data?.categories?.[catKey]?.tasks?.[taskKey];
   if (!task) return;
   const ok = confirm(`¿Eliminar la tarea “${task.label}”?`);
@@ -896,14 +976,19 @@ async function deleteTask(catKey, taskKey){
       deleted: true,
       done: false,
       by: null,
+      byEmail: null,
       time: null,
+      updatedBy: actor.name,
+      updatedByEmail: actor.email,
       updatedAt: Date.now()
     });
   }
   await db.ref(ROOT_PATH).update({ updatedAt: Date.now() });
+  await logAudit("task_deleted", { catKey, taskKey, label: task.label || "", custom: Boolean(task.custom) });
 }
 
 async function resetDay(){
+  const actor = getActor();
   if (!state.data) return;
   const ok = confirm("¿Archivar todo el avance actual al historial y reiniciar el radar en blanco? El progreso normalmente se conserva entre días: solo haz esto si de verdad quieren empezar un ciclo nuevo.");
   if (!ok) return;
@@ -912,6 +997,8 @@ async function resetDay(){
   await db.ref(`${HISTORY_PATH}/${archiveKey}`).set({
     ...state.data,
     archivedAt: Date.now(),
+    archivedBy: actor.name,
+    archivedByEmail: actor.email,
     archivedFrom: ROOT_PATH
   });
   state.open = {};
@@ -937,8 +1024,11 @@ async function resetDay(){
     categories: blank,
     updatedAt: Date.now(),
     allAreasCoveredAt: null,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    createdBy: actor.name,
+    createdByEmail: actor.email
   });
+  await logAudit("cycle_reset", { archiveKey, archivedDateLabel: state.data.dateLabel || today });
 }
 
 async function maybeStampAllAreasCovered(data){
@@ -1031,10 +1121,9 @@ $("#historyList").addEventListener("click", (event) => {
   if (toggle) toggle.textContent = entry.classList.contains("collapsed") ? "▸" : "▾";
 });
 
-function openAndHighlight(catKey, taskKey, person = null){
+function openAndHighlight(catKey, taskKey){
   state.open[catKey] = true;
   state.highlighted = { catKey, taskKey };
-  if (person) $("#who").value = person;
   render(state.data);
   requestAnimationFrame(() => {
     const el = document.querySelector(`.task[data-cat-key="${CSS.escape(catKey)}"][data-task-key="${CSS.escape(taskKey)}"]`);
@@ -1149,16 +1238,61 @@ $("#resetDay").addEventListener("click", resetDay);
 $("#doAlekSuggestion").addEventListener("click", (event) => {
   const btn = event.currentTarget;
   if (!btn.dataset.catKey) return;
-  openAndHighlight(btn.dataset.catKey, btn.dataset.taskKey, "Alek");
+  openAndHighlight(btn.dataset.catKey, btn.dataset.taskKey);
 });
 
 $("#doCataSuggestion").addEventListener("click", (event) => {
   const btn = event.currentTarget;
   if (!btn.dataset.catKey) return;
-  openAndHighlight(btn.dataset.catKey, btn.dataset.taskKey, "Cata");
+  openAndHighlight(btn.dataset.catKey, btn.dataset.taskKey);
 });
 
-ensureInit().then(startLive).catch((error) => {
-  console.error(error);
-  alert("No se pudo iniciar el radar. Revisa Firebase o la conexión. Porque claramente una checklist también necesita drama técnico.");
+$("#googleLogin").addEventListener("click", async () => {
+  const button = $("#googleLogin");
+  button.disabled = true;
+  showLogin("Abriendo Google…");
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    await auth.signInWithPopup(provider);
+  } catch (error){
+    console.error(error);
+    showLogin("No se pudo iniciar sesión. Revisa la ventana de Google e inténtalo de nuevo.", true);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("#logoutBtn").addEventListener("click", () => auth.signOut());
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user){
+    state.user = null;
+    if (state.started){
+      db.ref(ROOT_PATH).off();
+      state.started = false;
+    }
+    showLogin();
+    return;
+  }
+
+  const email = String(user.email || "").trim().toLowerCase();
+  const name = ALLOWED_USERS[email];
+  if (!name){
+    await auth.signOut();
+    showLogin("Este correo no está autorizado para el Radar Gerencial.", true);
+    return;
+  }
+
+  state.user = { name, email };
+  showApp(state.user);
+  if (state.started) return;
+  try {
+    await ensureInit();
+    startLive();
+    state.started = true;
+  } catch (error){
+    console.error(error);
+    showLogin("No se pudo cargar el radar. Revisa los permisos de Firebase.", true);
+  }
 });
